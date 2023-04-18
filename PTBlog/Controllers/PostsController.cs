@@ -1,30 +1,28 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using PTBlog.Data;
-using PTBlog.Models;
+using PTBlog.Data.Repositories;
 
 namespace PTBlog.Controllers;
 
 [Route("{controller}")]
 public sealed class PostsController : Controller
 {
-    public PostsController(DatabaseContext dbContext)
+    public PostsController(IPostsRepository postsRepository)
     {
-        _dbContext = dbContext;
+		_postsRepository = postsRepository;
     }
 
     [Route("")]
     [Route("Listings")]
     public async Task<IActionResult> Listings()
     {
-        var posts = await _dbContext.Posts.Include(p => p.Author).ToListAsync();
+        var posts = await _postsRepository.GetPostsAsync();
         return View(posts);
     }
 
 	[Route("{id}")]
 	public async Task<IActionResult> Listing(int? id)
     {
-        var post = await FindListingByIdAsync(id);
+        var post = await _postsRepository.GetPostByIdAsync(id);
         if (post is null)
         {
             return NotFound();
@@ -33,15 +31,5 @@ public sealed class PostsController : Controller
         return View(post);
     }
 
-    private async Task<PostModel?> FindListingByIdAsync(int? id)
-    {
-		if (id is null || _dbContext.Posts is null)
-		{
-			return null;
-		}
-
-		return await _dbContext.Posts.Include(p => p.Author).FirstOrDefaultAsync(p => p.Id == id);
-	}
-
-    private readonly DatabaseContext _dbContext;
+    private readonly IPostsRepository _postsRepository;
 }

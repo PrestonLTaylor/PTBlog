@@ -10,6 +10,11 @@ public sealed class PostsRepository : IPostsRepository
 		_dbContext = dbContext ?? throw new InvalidOperationException($"A null database context was provided to {nameof(PostsRepository)}");
 	}
 
+	public async Task<List<PostModel>> GetPostsAsync()
+	{
+		return await GetPostsWithTheirRelations().ToListAsync();
+	}
+
 	public async Task<PostModel?> GetPostByIdAsync(int? postId)
 	{
 		if (postId is null)
