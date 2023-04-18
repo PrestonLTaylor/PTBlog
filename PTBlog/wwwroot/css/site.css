@@ -33,3 +33,11 @@ body {
 .post-title {
     margin-bottom: 0;
 }
+
+.nav-link {
+    transition: 0.3s;
+}
+
+.nav-link:hover, .nav-link:focus {
+    backdrop-filter: invert(15%);
+}
