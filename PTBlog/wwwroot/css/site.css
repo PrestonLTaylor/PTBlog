@@ -20,3 +20,12 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.profile-picture {
+    max-width: 64px;
+    max-height: 64px;
+}
+
+.profile-posts {
+    margin-top: 1.5rem;
+}
