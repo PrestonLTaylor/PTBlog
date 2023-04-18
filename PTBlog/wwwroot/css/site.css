@@ -41,3 +41,7 @@ body {
 .nav-link:hover, .nav-link:focus {
     backdrop-filter: invert(15%);
 }
+
+.navbar {
+    padding: 0;
+}
