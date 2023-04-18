@@ -40,7 +40,7 @@ public sealed class PostsController : Controller
 			return null;
 		}
 
-		return await _dbContext.Posts.FirstOrDefaultAsync(p => p.Id == id);
+		return await _dbContext.Posts.Include(p => p.Author).FirstOrDefaultAsync(p => p.Id == id);
 	}
 
     private readonly DatabaseContext _dbContext;

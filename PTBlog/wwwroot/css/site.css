@@ -29,3 +29,7 @@ body {
 .profile-posts {
     margin-top: 1.5rem;
 }
+
+.post-title {
+    margin-bottom: 0;
+}
