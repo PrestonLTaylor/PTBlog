@@ -10,11 +10,15 @@ public sealed class PostModel
 
     public Guid AuthorGuid { get; set; }
 
-    [ForeignKey("AuthorGuid")]
-    public UserModel Author { get; set; }
+	[ForeignKey("AuthorGuid")]
+	public UserModel Author { get; set; }
 
-    public string Title { get; set; }
-    public string Content { get; set; }
-    public DateTimeOffset CreatedDate { get; set; }
-    public DateTimeOffset? UpdatedDate { get; set; }
+	public string Title { get; set; }
+	public string Content { get; set; }
+
+	[Display(Name = "Created Date")]
+	public DateTimeOffset CreatedDate { get; set; }
+
+	[Display(Name = "Updated Date")]
+	public DateTimeOffset? UpdatedDate { get; set; }
 }

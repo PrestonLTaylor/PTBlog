@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PTBlog.Data;
 
 namespace PTBlog.Controllers;
@@ -13,9 +14,9 @@ public sealed class PostsController : Controller
 
     [Route("")]
     [Route("Listings")]
-    public IActionResult Listings()
+    public async Task<IActionResult> Listings()
     {
-        var posts = _dbContext.Posts.ToList();
+        var posts = await _dbContext.Posts.Include(p => p.Author).ToListAsync();
         return View(posts);
     }
 
