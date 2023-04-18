@@ -17,8 +17,10 @@ public sealed class PostModel
 	public string Content { get; set; }
 
 	[Display(Name = "Created Date")]
+	[DisplayFormat(DataFormatString="{0:d}")]
 	public DateTimeOffset CreatedDate { get; set; }
 
 	[Display(Name = "Updated Date")]
+	[DisplayFormat(DataFormatString = "{0:d}")]
 	public DateTimeOffset? UpdatedDate { get; set; }
 }
