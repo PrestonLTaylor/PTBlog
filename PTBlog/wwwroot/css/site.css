@@ -25,3 +25,7 @@ body {
     max-width: 64px;
     max-height: 64px;
 }
+
+.profile-posts {
+    margin-top: 1.5rem;
+}

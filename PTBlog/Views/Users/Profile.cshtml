@@ -1,0 +1,46 @@
+﻿@model UserModel
+@{
+	ViewData["Title"] = $"{Model.Username}'s Profile";
+}
+
+<section>
+	<h1>@Model.Username's Profile</h1>
+
+	<img class="profile-picture" src="@Model.ProfilePictureURL" alt="@Model.Username's Profile Picture" />
+
+	<h2 class="profile-posts">@Model.Username's Posts</h2>
+	<table class="table">
+		<thead>
+			<tr>
+				<th>@Html.DisplayNameFor(model => model.Posts.FirstOrDefault()!.Id)</th>
+				<th>@Html.DisplayNameFor(model => model.Posts.FirstOrDefault()!.Author)</th>
+				<th>@Html.DisplayNameFor(model => model.Posts.FirstOrDefault()!.Title)</th>
+				<th>@Html.DisplayNameFor(model => model.Posts.FirstOrDefault()!.CreatedDate)</th>
+				<th>@Html.DisplayNameFor(model => model.Posts.FirstOrDefault()!.UpdatedDate)</th>
+			</tr>
+		</thead>
+
+		<tbody>
+			@foreach (var post in Model.Posts)
+			{
+				<tr>
+					<td class="align-middle">
+					@Html.DisplayFor(model => post.Id)
+					</td>
+					<td class="align-middle">
+					@Html.DisplayFor(model => post.Author.Username)
+					</td>
+					<td class="align-middle">
+						<a asp-area="" asp-controller="Posts" asp-action="Listing" asp-route-id="@post.Id">@Html.DisplayFor(model => post.Title)</a>
+					</td>
+					<td class="align-middle">
+					@Html.DisplayFor(model => post.CreatedDate)
+					</td>
+					<td class="align-middle">
+					@Html.DisplayFor(model => post.UpdatedDate)
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+</section>

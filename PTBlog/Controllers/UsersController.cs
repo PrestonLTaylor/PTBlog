@@ -39,7 +39,7 @@ public sealed class UsersController : Controller
 			return null;
 		}
 
-		return await _dbContext.Users.FirstOrDefaultAsync(u => u.Id.Equals(guid));
+		return await _dbContext.Users.Include(u => u.Posts).FirstOrDefaultAsync(u => u.Id.Equals(guid));
 	}
 
 	private readonly DatabaseContext _dbContext;
