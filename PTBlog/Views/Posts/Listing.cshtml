@@ -1,0 +1,15 @@
+﻿@model PostModel
+@{
+	ViewData["Title"] = Model.Title;
+}
+
+<article>
+	<h1>@Model.Title</h1>
+
+	<pre>@Model.Content</pre>
+
+	<details>
+		<p>Created On: @Html.DisplayFor(p => p.CreatedDate)</p>
+		<p>Updated On: @Html.DisplayFor(p => p.UpdatedDate)</p>
+	</details>
+</article>
