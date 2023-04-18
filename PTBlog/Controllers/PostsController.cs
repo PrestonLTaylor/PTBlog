@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PTBlog.Data;
+using PTBlog.Models;
 
 namespace PTBlog.Controllers;
 
@@ -23,12 +24,7 @@ public sealed class PostsController : Controller
 	[Route("{id}")]
 	public async Task<IActionResult> Listing(int? id)
     {
-        if (id is null || _dbContext.Posts is null)
-        {
-            return NotFound();
-        }
-
-        var post = await _dbContext.Posts.FirstOrDefaultAsync(p => p.Id == id);
+        var post = await FindListingByIdAsync(id);
         if (post is null)
         {
             return NotFound();
@@ -36,6 +32,16 @@ public sealed class PostsController : Controller
 
         return View(post);
     }
+
+    private async Task<PostModel?> FindListingByIdAsync(int? id)
+    {
+		if (id is null || _dbContext.Posts is null)
+		{
+			return null;
+		}
+
+		return await _dbContext.Posts.FirstOrDefaultAsync(p => p.Id == id);
+	}
 
     private readonly DatabaseContext _dbContext;
 }
