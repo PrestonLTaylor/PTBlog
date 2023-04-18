@@ -1,0 +1,43 @@
+﻿@model IEnumerable<PostModel>
+@{
+	ViewData["Title"] = "Listings";
+}
+
+<h1>Posts</h1>
+
+<div class="row">
+	<table class="table">
+		<thead>
+			<tr>
+				<th>@Html.DisplayNameFor(model => model.Id)</th>
+				<th>@Html.DisplayNameFor(model => model.Author)</th>
+				<th>@Html.DisplayNameFor(model => model.Title)</th>
+				<th>@Html.DisplayNameFor(model => model.CreatedDate)</th>
+				<th>@Html.DisplayNameFor(model => model.UpdatedDate)</th>
+			</tr>
+		</thead>
+
+		<tbody>
+			@foreach (var post in Model)
+			{
+				<tr>
+					<td class="align-middle">
+						@Html.DisplayFor(model => post.Id)
+					</td>
+					<td class="align-middle">
+						@Html.DisplayFor(model => post.Author.Username)
+					</td>
+					<td class="align-middle">
+						@Html.DisplayFor(model => post.Title)
+					</td>
+					<td class="align-middle">
+						@Html.DisplayFor(model => post.CreatedDate)
+					</td>
+					<td class="align-middle">
+						@Html.DisplayFor(model => post.UpdatedDate)
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+</div>
