@@ -28,7 +28,7 @@
 						@Html.DisplayFor(model => post.Author.Username)
 					</td>
 					<td class="align-middle">
-						@Html.DisplayFor(model => post.Title)
+						<a asp-area="" asp-controller="Posts" asp-action="Listing" asp-route-id="@post.Id">@Html.DisplayFor(model => post.Title)</a>
 					</td>
 					<td class="align-middle">
 						@Html.DisplayFor(model => post.CreatedDate)
