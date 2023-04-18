@@ -1,5 +1,6 @@
 using PTBlog.Data;
 using Microsoft.EntityFrameworkCore;
+using PTBlog.Data.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +10,7 @@ builder.Services.AddDbContext<DatabaseContext>(options =>
     options.UseNpgsql(connectionString);
 });
 
+builder.Services.AddRepositoriesSerivces();
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
