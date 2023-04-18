@@ -3,7 +3,7 @@ using PTBlog.Models;
 
 namespace PTBlog.Data.Repositories;
 
-public sealed class PostsRepository
+public sealed class PostsRepository : IPostsRepository
 {
 	public PostsRepository(DatabaseContext dbContext)
 	{
