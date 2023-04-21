@@ -50,3 +50,7 @@ body {
     max-width: 16px;
     max-height: 16px;
 }
+
+.blog-form-item {
+    margin-bottom: 1rem;
+}

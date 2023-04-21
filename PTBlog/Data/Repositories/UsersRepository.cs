@@ -1,13 +1,17 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using PTBlog.Models;
+using System.Security.Claims;
 
 namespace PTBlog.Data.Repositories;
 
 public sealed class UsersRepository : IUsersRepository
 {
-	public UsersRepository(DatabaseContext dbContext)
+	// DESIGN: Maybe move UserManager out of UserRepository and into its own Adapter
+	public UsersRepository(DatabaseContext dbContext, UserManager<UserModel> userManager)
 	{
 		_dbContext = dbContext ?? throw new InvalidOperationException($"A null database context was provided to {nameof(UsersRepository)}");
+		_userManager = userManager;
 	}
 
 	public async Task<List<UserModel>> GetUsersAsync()
@@ -25,10 +29,16 @@ public sealed class UsersRepository : IUsersRepository
 		return await GetUsersWithTheirRelations().FirstOrDefaultAsync(u => u.Id.Equals(id));
 	}
 
+	public async Task<UserModel?> GetUserByClaimAsync(ClaimsPrincipal claim)
+	{
+		return await _userManager.GetUserAsync(claim);
+	}
+
 	private IQueryable<UserModel> GetUsersWithTheirRelations()
 	{
 		return _dbContext.Users.Include(u => u.Posts);
 	}
 
 	private readonly DatabaseContext _dbContext;
+	private readonly UserManager<UserModel> _userManager;
 }

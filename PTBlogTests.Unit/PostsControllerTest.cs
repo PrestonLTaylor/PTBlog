@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 using PTBlog.Controllers;
 using PTBlog.Data.Repositories;
 using PTBlog.Models;
+using System.Security.Claims;
 
 namespace PTBlogTests.Unit;
 
@@ -13,8 +15,8 @@ internal class PostsControllerTest
 	{
 		// Arrange
 		var fakePosts = GenerateFakePosts();
-		_repoMock.Setup(repo => repo.GetPostsAsync()).ReturnsAsync(fakePosts);
-		PostsController controller = new(_repoMock.Object);
+		_postRepoMock.Setup(repo => repo.GetPostsAsync()).ReturnsAsync(fakePosts);
+		PostsController controller = new(_postRepoMock.Object, _userRepoMock.Object);
 
 		// Act
 		var result = await controller.Listings() as ViewResult;
@@ -30,8 +32,8 @@ internal class PostsControllerTest
 		// Arrange
 		var fakePosts = GenerateFakePosts();
 		var specificPost = fakePosts.First();
-		_repoMock.Setup(repo => repo.GetPostByIdAsync(specificPost.Id)).ReturnsAsync(specificPost);
-		PostsController controller = new(_repoMock.Object);
+		_postRepoMock.Setup(repo => repo.GetPostByIdAsync(specificPost.Id)).ReturnsAsync(specificPost);
+		PostsController controller = new(_postRepoMock.Object, _userRepoMock.Object);
 
 		// Act
 		var result = await controller.Listing(specificPost.Id) as ViewResult;
@@ -46,8 +48,8 @@ internal class PostsControllerTest
 	{
 		// Arrange
 		const int invalidPostId = -1;
-		_repoMock.Setup(repo => repo.GetPostByIdAsync(invalidPostId)).ReturnsAsync((PostModel?)null);
-		PostsController controller = new(_repoMock.Object);
+		_postRepoMock.Setup(repo => repo.GetPostByIdAsync(invalidPostId)).ReturnsAsync((PostModel?)null);
+		PostsController controller = new(_postRepoMock.Object, _userRepoMock.Object);
 
 		// Act
 		var result = await controller.Listing(invalidPostId) as NotFoundResult;
@@ -69,5 +71,34 @@ internal class PostsControllerTest
 		return fakePosts;
 	}
 
-	private readonly Mock<IPostsRepository> _repoMock = new();
+	[Test]
+	public async Task Create_CreatesPost_WhenSuppliedValidPost()
+	{
+		// Arrange
+		const string authorId = "Fake ID"; 
+		UserModel fakeUser = new UserModel { Id = authorId, };
+		_userRepoMock.Setup(repo => repo.GetUserByClaimAsync(It.IsAny<ClaimsPrincipal>())).ReturnsAsync(fakeUser);
+		PostModel expectedPost = GeneratePostToCreate(fakeUser);
+		_postRepoMock.Setup(repo => repo.AddPostAsync(It.Is<PostModel>(
+				post => post.Title == expectedPost.Title && post.Content == expectedPost.Content && post.AuthorId == expectedPost.AuthorId
+				))).Verifiable();
+		PostsController controller = new(_postRepoMock.Object, _userRepoMock.Object);
+
+		// Act
+		await controller.Create(new PostDTO(expectedPost.Title, expectedPost.Content));
+
+		// Assert
+		_postRepoMock.VerifyAll();
+	}
+
+	private PostModel GeneratePostToCreate(UserModel fakeUser)
+	{
+		const int postId = 1;
+		const string postTitle = "Fake Title";
+		const string postContent = "Fake Content";
+		return new PostModel { Id = postId, Title = postTitle, Content = postContent, AuthorId = fakeUser.Id };
+	}
+
+	private readonly Mock<IUsersRepository> _userRepoMock = new();
+	private readonly Mock<IPostsRepository> _postRepoMock = new();
 }
