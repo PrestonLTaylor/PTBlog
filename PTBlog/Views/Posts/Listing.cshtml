@@ -6,7 +6,7 @@
 <article>
 	<h1 class="post-title"><cite>@Model.Title</cite></h1>
 	<p>
-		By <a asp-area="" asp-controller="Users" asp-action="Profile" asp-route-guid="@Model.Author.Id">@Model.Author.Username</a>
+		By <a asp-area="" asp-controller="Users" asp-action="Profile" asp-route-id="@Model.Author.Id">@Model.Author.Username</a>
 	</p>
 
 	<pre>@Model.Content</pre>

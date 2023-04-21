@@ -8,9 +8,9 @@ public sealed class PostModel
     [Key]
     public int Id { get; set; }
 
-    public Guid AuthorGuid { get; set; }
+    public string AuthorId { get; set; }
 
-	[ForeignKey("AuthorGuid")]
+	[ForeignKey("AuthorId")]
 	public UserModel Author { get; set; }
 
 	public string Title { get; set; }

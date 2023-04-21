@@ -15,14 +15,14 @@ public sealed class UsersRepository : IUsersRepository
 		return await GetUsersWithTheirRelations().ToListAsync();
 	}
 
-	public async Task<UserModel?> GetUserByGuidAsync(Guid? guid)
+	public async Task<UserModel?> GetUserByIdAsync(string? id)
 	{
-		if (guid is null)
+		if (id is null)
 		{
 			return null;
 		}
 
-		return await GetUsersWithTheirRelations().FirstOrDefaultAsync(u => u.Id.Equals(guid));
+		return await GetUsersWithTheirRelations().FirstOrDefaultAsync(u => u.Id.Equals(id));
 	}
 
 	private IQueryable<UserModel> GetUsersWithTheirRelations()

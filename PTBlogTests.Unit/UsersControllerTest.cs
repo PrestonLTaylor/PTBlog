@@ -30,7 +30,7 @@ internal sealed class UsersControllerTest
 		// Arrange
 		var fakeUsers = GenerateFakeUsers();
 		var specificUser = fakeUsers.First();
-		_repoMock.Setup(repo => repo.GetUserByGuidAsync(specificUser.Id)).ReturnsAsync(specificUser);
+		_repoMock.Setup(repo => repo.GetUserByIdAsync(specificUser.Id)).ReturnsAsync(specificUser);
 		UsersController controller = new(_repoMock.Object);
 
 		// Act
@@ -45,8 +45,8 @@ internal sealed class UsersControllerTest
 	public async Task Profile_ReturnsNotFound_WhenSuppliedInvalidId()
 	{
 		// Arrange
-		var invalidUserGuid = Guid.NewGuid();
-		_repoMock.Setup(repo => repo.GetUserByGuidAsync(invalidUserGuid)).ReturnsAsync((UserModel?)null);
+		var invalidUserGuid = Guid.NewGuid().ToString();
+		_repoMock.Setup(repo => repo.GetUserByIdAsync(invalidUserGuid)).ReturnsAsync((UserModel?)null);
 		UsersController controller = new(_repoMock.Object);
 
 		// Act
@@ -63,7 +63,7 @@ internal sealed class UsersControllerTest
 		for (int i = 1; i < numberOfUsers; ++i)
 		{
 			var fakeUserString = $"Fake User {i}";
-			fakeUsers.Add(new UserModel { Id = Guid.NewGuid(), ProfilePictureURL = fakeUserString, Username = fakeUserString});
+			fakeUsers.Add(new UserModel { Id = Guid.NewGuid().ToString(), ProfilePictureURL = fakeUserString, Username = fakeUserString});
 		}
 
 		return fakeUsers;

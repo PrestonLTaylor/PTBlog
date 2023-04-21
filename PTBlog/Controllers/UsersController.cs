@@ -21,10 +21,10 @@ public sealed class UsersController : Controller
 		return View(users);
 	}
 
-	[Route("{guid}")]
-	public async Task<IActionResult> Profile(Guid? guid)
+	[Route("{id:guid}")]
+	public async Task<IActionResult> Profile(string id)
 	{
-		var user = await _usersRepository.GetUserByGuidAsync(guid);
+		var user = await _usersRepository.GetUserByIdAsync(id);
 		if (user is null)
 		{
 			return NotFound();

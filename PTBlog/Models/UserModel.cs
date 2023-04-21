@@ -1,16 +1,19 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
 namespace PTBlog.Models;
 
-public sealed class UserModel
+// TODO: Add maximum lengths to strings in models
+public sealed class UserModel : IdentityUser
 {
-    [Key]
-    public Guid Id { get; set; }
-
     [Display(Name = "Profile Picture")]
     public string ProfilePictureURL { get; set; }
 
-    public string Username { get; set; }
-
     public List<PostModel> Posts { get; set; }
+
+    public string? Username
+    {
+        get => UserName;
+        set => UserName = value;
+    }
 }
