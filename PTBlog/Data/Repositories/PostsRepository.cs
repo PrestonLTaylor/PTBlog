@@ -25,6 +25,12 @@ public sealed class PostsRepository : IPostsRepository
 		return await GetPostsWithTheirRelations().FirstOrDefaultAsync(p => p.Id == postId);
 	}
 
+	public async Task AddPostAsync(PostModel model)
+	{
+		await _dbContext.Posts.AddAsync(model);
+		await _dbContext.SaveChangesAsync();
+	}
+
 	private IQueryable<PostModel> GetPostsWithTheirRelations()
 	{
 		return _dbContext.Posts.Include(p => p.Author);
