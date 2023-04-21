@@ -12,9 +12,9 @@ public sealed class PostsController : Controller
 {
     public PostsController(IPostsRepository postsRepository, IUsersRepository usersRepository)
     {
-		_postsRepository = postsRepository;
-		_usersRepository = usersRepository;
-	}
+        _postsRepository = postsRepository;
+        _usersRepository = usersRepository;
+    }
 
     [Route("")]
     [Route("Listings")]
@@ -24,8 +24,8 @@ public sealed class PostsController : Controller
         return View(posts);
     }
 
-	[Route("{id}")]
-	public async Task<IActionResult> Listing(int? id)
+    [Route("{id}")]
+    public async Task<IActionResult> Listing(int? id)
     {
         var post = await _postsRepository.GetPostByIdAsync(id);
         if (post is null)
@@ -74,6 +74,24 @@ public sealed class PostsController : Controller
 
         return View(post);
     }
+
+    [HttpPost("Delete/{id}")]
+    [Authorize]
+    public async Task<IActionResult> DeleteConfirmed(int id)
+    {
+		var post = await _postsRepository.GetPostByIdAsync(id);
+		if (post is null)
+		{
+			return NotFound();
+		}
+		if (await IsNotUsersPostAsync(post))
+		{
+			return Forbid();
+		}
+
+        await _postsRepository.DeletePostAsync(post);
+		return RedirectToAction(nameof(Listings));
+	}
 
     private async Task<PostModel> CreatePostFromDTOAsync(PostDTO postDto)
     {
