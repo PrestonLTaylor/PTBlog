@@ -45,3 +45,8 @@ body {
 .navbar {
     padding: 0;
 }
+
+.nav-profile-picture {
+    max-width: 16px;
+    max-height: 16px;
+}
