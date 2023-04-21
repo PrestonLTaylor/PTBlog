@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PTBlog.Data.Repositories;
+using PTBlog.Models;
 
 namespace PTBlog.Controllers;
 
@@ -29,6 +31,13 @@ public sealed class PostsController : Controller
         }
 
         return View(post);
+    }
+
+    [Route("{action}")]
+    [Authorize]
+    public IActionResult Create()
+    {
+        return View();
     }
 
     private readonly IPostsRepository _postsRepository;
