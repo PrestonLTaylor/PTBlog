@@ -2,7 +2,6 @@ using PTBlog.Data;
 using PTBlog.Models;
 using Microsoft.EntityFrameworkCore;
 using PTBlog.Data.Repositories;
-using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
