@@ -58,6 +58,23 @@ public sealed class PostsController : Controller
         return RedirectToAction(nameof(Listing), new { id = post.Id });
     }
 
+    [Route("{action}/{id}")]
+    [Authorize]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var post = await _postsRepository.GetPostByIdAsync(id);
+        if (post is null)
+        {
+            return NotFound();
+        }
+        if (await IsNotUsersPostAsync(post))
+        {
+            return Forbid();
+        }
+
+        return View(post);
+    }
+
     private async Task<PostModel> CreatePostFromDTOAsync(PostDTO postDto)
     {
         var post = new PostModel { Title = postDto.Title, Content = postDto.Content };
@@ -78,6 +95,12 @@ public sealed class PostsController : Controller
     {
         post.CreatedDate = DateTimeOffset.UtcNow;
     }
+
+    private async Task<bool> IsNotUsersPostAsync(PostModel post)
+    {
+        var user = await _usersRepository.GetUserByClaimAsync(User);
+        return post.AuthorId != user!.Id;
+	}
 
     private readonly IPostsRepository _postsRepository;
 	private readonly IUsersRepository _usersRepository;
