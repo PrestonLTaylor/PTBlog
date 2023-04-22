@@ -124,8 +124,11 @@ internal class PostsControllerTest
 		var viewModel = result?.ViewData.Model as PostModel;
 
 		// Assert
-		Assert.That(result, Is.Not.Null);
-		Assert.That(viewModel, Is.EqualTo(specificPost));
+		Assert.Multiple(() =>
+		{
+			Assert.That(result, Is.Not.Null);
+			Assert.That(viewModel, Is.EqualTo(specificPost));
+		});
 	}
 
 	[Test]
@@ -145,8 +148,11 @@ internal class PostsControllerTest
 		var result = await controller.EditConfirmed(specificPost.Id, updatedPostDto) as RedirectToActionResult;
 
 		// Assert
-		Assert.That(result, Is.Not.Null);
-		_postRepoMock.VerifyAll();
+		Assert.Multiple(() =>
+		{
+			Assert.That(result, Is.Not.Null);
+			_postRepoMock.VerifyAll();
+		});
 	}
 
 	[Test]
@@ -197,8 +203,11 @@ internal class PostsControllerTest
 		var viewModel = result?.ViewData.Model as PostModel;
 
 		// Assert
-		Assert.That(result, Is.Not.Null);
-		Assert.That(viewModel, Is.EqualTo(specificPost));
+		Assert.Multiple(() =>
+		{
+			Assert.That(result, Is.Not.Null);
+			Assert.That(viewModel, Is.EqualTo(specificPost));
+		});
 	}
 
 	[Test]
@@ -249,8 +258,11 @@ internal class PostsControllerTest
 		var result = await controller.DeleteConfirmed(specificPost.Id) as RedirectToActionResult;
 
 		// Assert
-		Assert.That(result, Is.Not.Null);
-		_postRepoMock.VerifyAll();
+		Assert.Multiple(() =>
+		{
+			Assert.That(result, Is.Not.Null);
+			_postRepoMock.VerifyAll();
+		});
 	}
 
 	[Test]
