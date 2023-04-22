@@ -58,6 +58,128 @@ internal class PostsControllerTest
 		Assert.That(result, Is.Not.Null);
 	}
 
+	[Test]
+	public async Task Create_CreatesPost_WhenSuppliedValidPost()
+	{
+		// Arrange
+		const string authorId = "Fake ID"; 
+		UserModel fakeUser = new UserModel { Id = authorId, };
+		_userRepoMock.Setup(repo => repo.GetUserByClaimAsync(It.IsAny<ClaimsPrincipal>())).ReturnsAsync(fakeUser);
+		PostModel expectedPost = GeneratePostToCreate(fakeUser);
+		_postRepoMock.Setup(repo => repo.AddPostAsync(It.Is<PostModel>(post => post.Equals(expectedPost)))).Verifiable();
+		PostsController controller = new(_postRepoMock.Object, _userRepoMock.Object);
+
+		// Act
+		await controller.Create(new PostDTO(expectedPost.Title, expectedPost.Content));
+
+		// Assert
+		_postRepoMock.VerifyAll();
+	}
+
+	[Test]
+	public async Task Delete_ShowsDeleteConfirmation_WhenSuppliedAValidPostIdAndIsAuthor()
+	{
+		// Arrange
+		var fakePosts = GenerateFakePosts();
+		var specificPost = fakePosts.First();
+		_postRepoMock.Setup(repo => repo.GetPostByIdAsync(specificPost.Id)).ReturnsAsync(specificPost);
+		_userRepoMock.Setup(repo => repo.GetUserByClaimAsync(It.IsAny<ClaimsPrincipal>())).ReturnsAsync(new UserModel { Id = specificPost.AuthorId });
+		PostsController controller = new(_postRepoMock.Object, _userRepoMock.Object);
+
+		// Act
+		var result = await controller.Delete(specificPost.Id) as ViewResult;
+		var viewModel = result?.ViewData.Model as PostModel;
+
+		// Assert
+		Assert.That(result, Is.Not.Null);
+		Assert.That(viewModel, Is.EqualTo(specificPost));
+	}
+
+	[Test]
+	public async Task Delete_ReturnsNotFound_WhenPostDoesNotExist()
+	{
+		// Arrange
+		const int invalidPostId = -1;
+		_postRepoMock.Setup(repo => repo.GetPostByIdAsync(invalidPostId)).ReturnsAsync((PostModel?)null);
+		PostsController controller = new(_postRepoMock.Object, _userRepoMock.Object);
+
+		// Act
+		var result = await controller.Delete(invalidPostId) as NotFoundResult;
+
+		// Assert
+		Assert.That(result, Is.Not.Null);
+	}
+
+	[Test]
+	public async Task Delete_ReturnsForbid_WhenUserIsNotAuthor()
+	{
+		// Arrange
+		string actualAuthorId = Guid.NewGuid().ToString();
+		var fakePosts = GenerateFakePosts();
+		var specificPost = fakePosts.First();
+		_postRepoMock.Setup(repo => repo.GetPostByIdAsync(specificPost.Id)).ReturnsAsync(specificPost);
+		_userRepoMock.Setup(repo => repo.GetUserByClaimAsync(It.IsAny<ClaimsPrincipal>())).ReturnsAsync(new UserModel { Id = actualAuthorId });
+		PostsController controller = new(_postRepoMock.Object, _userRepoMock.Object);
+
+		// Act
+		var result = await controller.Delete(specificPost.Id) as ForbidResult;
+
+		// Assert
+		Assert.That(result, Is.Not.Null);
+	}
+
+	[Test]
+	public async Task DeleteConfirmed_DeletesAPost_WhenSuppliedAValidPostIdAndIsAuthor()
+	{
+		// Arrange
+		var fakePosts = GenerateFakePosts();
+		var specificPost = fakePosts.First();
+		_postRepoMock.Setup(repo => repo.GetPostByIdAsync(specificPost.Id)).ReturnsAsync(specificPost);
+		_postRepoMock.Setup(repo => repo.DeletePostAsync(It.Is<PostModel>(post => post.Equals(specificPost)))).Verifiable();
+		_userRepoMock.Setup(repo => repo.GetUserByClaimAsync(It.IsAny<ClaimsPrincipal>())).ReturnsAsync(new UserModel { Id = specificPost.AuthorId });
+		PostsController controller = new(_postRepoMock.Object, _userRepoMock.Object);
+
+		// Act
+		var result = await controller.DeleteConfirmed(specificPost.Id) as RedirectToActionResult;
+
+		// Assert
+		Assert.That(result, Is.Not.Null);
+		_postRepoMock.VerifyAll();
+	}
+
+	[Test]
+	public async Task DeleteConfirmed_ReturnsNotFound_WhenPostDoesNotExist()
+	{
+		// Arrange
+		const int invalidPostId = -1;
+		_postRepoMock.Setup(repo => repo.GetPostByIdAsync(invalidPostId)).ReturnsAsync((PostModel?)null);
+		PostsController controller = new(_postRepoMock.Object, _userRepoMock.Object);
+
+		// Act
+		var result = await controller.DeleteConfirmed(invalidPostId) as NotFoundResult;
+
+		// Assert
+		Assert.That(result, Is.Not.Null);
+	}
+
+	[Test]
+	public async Task DeleteConfirmed_ReturnsForbid_WhenUserIsNotAuthor()
+	{
+		// Arrange
+		string actualAuthorId = Guid.NewGuid().ToString();
+		var fakePosts = GenerateFakePosts();
+		var specificPost = fakePosts.First();
+		_postRepoMock.Setup(repo => repo.GetPostByIdAsync(specificPost.Id)).ReturnsAsync(specificPost);
+		_userRepoMock.Setup(repo => repo.GetUserByClaimAsync(It.IsAny<ClaimsPrincipal>())).ReturnsAsync(new UserModel { Id = actualAuthorId });
+		PostsController controller = new(_postRepoMock.Object, _userRepoMock.Object);
+
+		// Act
+		var result = await controller.DeleteConfirmed(specificPost.Id) as ForbidResult;
+
+		// Assert
+		Assert.That(result, Is.Not.Null);
+	}
+
 	private List<PostModel> GenerateFakePosts()
 	{
 		const int numberOfPosts = 10;
@@ -69,26 +191,6 @@ internal class PostsControllerTest
 		}
 
 		return fakePosts;
-	}
-
-	[Test]
-	public async Task Create_CreatesPost_WhenSuppliedValidPost()
-	{
-		// Arrange
-		const string authorId = "Fake ID"; 
-		UserModel fakeUser = new UserModel { Id = authorId, };
-		_userRepoMock.Setup(repo => repo.GetUserByClaimAsync(It.IsAny<ClaimsPrincipal>())).ReturnsAsync(fakeUser);
-		PostModel expectedPost = GeneratePostToCreate(fakeUser);
-		_postRepoMock.Setup(repo => repo.AddPostAsync(It.Is<PostModel>(
-				post => post.Title == expectedPost.Title && post.Content == expectedPost.Content && post.AuthorId == expectedPost.AuthorId
-				))).Verifiable();
-		PostsController controller = new(_postRepoMock.Object, _userRepoMock.Object);
-
-		// Act
-		await controller.Create(new PostDTO(expectedPost.Title, expectedPost.Content));
-
-		// Assert
-		_postRepoMock.VerifyAll();
 	}
 
 	private PostModel GeneratePostToCreate(UserModel fakeUser)
