@@ -31,6 +31,12 @@ public sealed class PostsRepository : IPostsRepository
 		await _dbContext.SaveChangesAsync();
 	}
 
+	public async Task DeletePostAsync(PostModel model)
+	{
+		_dbContext.Posts.Remove(model);
+		await _dbContext.SaveChangesAsync();
+	}
+
 	private IQueryable<PostModel> GetPostsWithTheirRelations()
 	{
 		return _dbContext.Posts.Include(p => p.Author);

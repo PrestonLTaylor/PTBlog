@@ -1,0 +1,22 @@
+﻿@model PostModel
+@{
+	ViewData["Title"] = $"Deleting post {Model.Title}";
+}
+
+<div class="row">
+	<section>
+		<h1>Are you sure you want to delete the blog @Model.Title?</h1>
+
+		<div class="forum-group">
+			<label asp-for="Content" class="form-label">Content</label>
+			<textarea asp-for="Content" class="form-control margin-bottom" rows="6" disabled></textarea>
+		</div>
+
+		<form asp-action="Delete">
+			<div class="form-group">
+				<input type="submit" value="Delete?" class="btn btn-danger" asp-action="Delete" />
+				<a class="btn btn-outline-info" asp-action="Listings">Back to listings</a>
+			</div>
+		</form>
+	</section>
+</div>

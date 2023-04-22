@@ -8,4 +8,6 @@ public interface IPostsRepository
 	public Task<PostModel?> GetPostByIdAsync(int? postId);
 
 	public Task AddPostAsync(PostModel post);
+
+	public Task DeletePostAsync(PostModel post);
 }
