@@ -55,7 +55,7 @@ public sealed class PostsController : Controller
 
         var post = await CreatePostFromDTOAsync(postDto);
         await _postsRepository.AddPostAsync(post);
-        return RedirectToAction(nameof(Listing), new { id = post.Id });
+        return RedirectToListing(post.Id);
     }
 
     [Route("{action}/{id}")]
@@ -90,7 +90,7 @@ public sealed class PostsController : Controller
 		}
 
         await _postsRepository.DeletePostAsync(post);
-		return RedirectToAction(nameof(Listings));
+        return RedirectToListings();
 	}
 
     private async Task<PostModel> CreatePostFromDTOAsync(PostDTO postDto)
@@ -120,6 +120,16 @@ public sealed class PostsController : Controller
         return post.AuthorId != user!.Id;
 	}
 
-    private readonly IPostsRepository _postsRepository;
+    private IActionResult RedirectToListings()
+    {
+		return RedirectToAction(nameof(Listings));
+	}
+
+	private IActionResult RedirectToListing(int postId)
+	{
+		return RedirectToAction(nameof(Listing), new { id = postId });
+	}
+
+	private readonly IPostsRepository _postsRepository;
 	private readonly IUsersRepository _usersRepository;
 }
