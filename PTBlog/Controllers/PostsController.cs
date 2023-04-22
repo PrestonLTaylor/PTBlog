@@ -55,7 +55,49 @@ public sealed class PostsController : Controller
 
         var post = await CreatePostFromDTOAsync(postDto);
         await _postsRepository.AddPostAsync(post);
-        return RedirectToAction(nameof(Listing), new { id = post.Id });
+        return RedirectToListing(post.Id);
+    }
+
+    [Route("{action}/{id}")]
+    [Authorize]
+    public async Task<IActionResult> Edit(int id)
+    {
+        var post = await _postsRepository.GetPostByIdAsync(id);
+		if (post is null)
+		{
+			return NotFound();
+		}
+		if (await IsNotUsersPostAsync(post))
+		{
+			return Forbid();
+		}
+
+		return View(new PostDTO{ Title = post.Title, Content = post.Content });
+    }
+
+    [HttpPost("{action}/{id}")]
+    [Authorize]
+    public async Task<IActionResult> EditConfirmed(int id, [Bind("Title,Content")]PostDTO postDto)
+    {
+		if (!ModelState.IsValid)
+		{
+			return View(postDto);
+		}
+
+		var post = await _postsRepository.GetPostByIdAsync(id);
+        if (post is null)
+        {
+            return NotFound();
+        }
+		if (await IsNotUsersPostAsync(post))
+		{
+			return Forbid();
+		}
+
+        UpdatePostTitleAndContent(post, postDto);
+		AddUpdatedDateToPost(post);
+        await _postsRepository.UpdatePostAsync(post);
+        return RedirectToListing(id);
     }
 
     [Route("{action}/{id}")]
@@ -90,7 +132,7 @@ public sealed class PostsController : Controller
 		}
 
         await _postsRepository.DeletePostAsync(post);
-		return RedirectToAction(nameof(Listings));
+        return RedirectToListings();
 	}
 
     private async Task<PostModel> CreatePostFromDTOAsync(PostDTO postDto)
@@ -114,12 +156,33 @@ public sealed class PostsController : Controller
         post.CreatedDate = DateTimeOffset.UtcNow;
     }
 
-    private async Task<bool> IsNotUsersPostAsync(PostModel post)
+    private void AddUpdatedDateToPost(PostModel post)
+    {
+        post.UpdatedDate = DateTimeOffset.UtcNow;
+    }
+
+    private void UpdatePostTitleAndContent(PostModel post, PostDTO postDto)
+    {
+        post.Title = postDto.Title;
+		post.Content = postDto.Content;
+	}
+
+	private async Task<bool> IsNotUsersPostAsync(PostModel post)
     {
         var user = await _usersRepository.GetUserByClaimAsync(User);
         return post.AuthorId != user!.Id;
 	}
 
-    private readonly IPostsRepository _postsRepository;
+    private IActionResult RedirectToListings()
+    {
+		return RedirectToAction(nameof(Listings));
+	}
+
+	private IActionResult RedirectToListing(int postId)
+	{
+		return RedirectToAction(nameof(Listing), new { id = postId });
+	}
+
+	private readonly IPostsRepository _postsRepository;
 	private readonly IUsersRepository _usersRepository;
 }

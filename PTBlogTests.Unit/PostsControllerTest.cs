@@ -77,6 +77,112 @@ internal class PostsControllerTest
 	}
 
 	[Test]
+	public async Task Edit_ReturnsForbid_WhenUserIsNotAuthor()
+	{
+		// Arrange
+		string actualAuthorId = Guid.NewGuid().ToString();
+		var fakePosts = GenerateFakePosts();
+		var specificPost = fakePosts.First();
+		_postRepoMock.Setup(repo => repo.GetPostByIdAsync(specificPost.Id)).ReturnsAsync(specificPost);
+		_userRepoMock.Setup(repo => repo.GetUserByClaimAsync(It.IsAny<ClaimsPrincipal>())).ReturnsAsync(new UserModel { Id = actualAuthorId });
+		PostsController controller = new(_postRepoMock.Object, _userRepoMock.Object);
+
+		// Act
+		var result = await controller.Edit(specificPost.Id) as ForbidResult;
+
+		// Assert
+		Assert.That(result, Is.Not.Null);
+	}
+
+	[Test]
+	public async Task Edit_ReturnsNotFound_WhenPostDoesNotExist()
+	{
+		// Arrange
+		const int invalidPostId = -1;
+		_postRepoMock.Setup(repo => repo.GetPostByIdAsync(invalidPostId)).ReturnsAsync((PostModel?)null);
+		PostsController controller = new(_postRepoMock.Object, _userRepoMock.Object);
+
+		// Act
+		var result = await controller.Edit(invalidPostId) as NotFoundResult;
+
+		// Assert
+		Assert.That(result, Is.Not.Null);
+	}
+
+	[Test]
+	public async Task Edit_ShowsEditPageWithCorrectPost_WhenSuppliedAValidPostIdAndIsAuthor()
+	{
+		// Arrange
+		var fakePosts = GenerateFakePosts();
+		var specificPost = fakePosts.First();
+		_postRepoMock.Setup(repo => repo.GetPostByIdAsync(specificPost.Id)).ReturnsAsync(specificPost);
+		_userRepoMock.Setup(repo => repo.GetUserByClaimAsync(It.IsAny<ClaimsPrincipal>())).ReturnsAsync(new UserModel { Id = specificPost.AuthorId });
+		PostsController controller = new(_postRepoMock.Object, _userRepoMock.Object);
+
+		// Act
+		var result = await controller.Delete(specificPost.Id) as ViewResult;
+		var viewModel = result?.ViewData.Model as PostModel;
+
+		// Assert
+		Assert.That(result, Is.Not.Null);
+		Assert.That(viewModel, Is.EqualTo(specificPost));
+	}
+
+	[Test]
+	public async Task EditConfirmed_EditsAPost_WhenSuppliedAValidPostIdAndIsAuthor()
+	{
+		// Arrange
+		var fakePosts = GenerateFakePosts();
+		var specificPost = fakePosts.First();
+		var updatedPost = fakePosts.Last();
+		var updatedPostDto = new PostDTO { Title = updatedPost.Title, Content = updatedPost.Content };
+		_postRepoMock.Setup(repo => repo.GetPostByIdAsync(specificPost.Id)).ReturnsAsync(specificPost);
+		_postRepoMock.Setup(repo => repo.UpdatePostAsync(It.Is<PostModel>(post => post.Equals(updatedPost)))).Verifiable();
+		_userRepoMock.Setup(repo => repo.GetUserByClaimAsync(It.IsAny<ClaimsPrincipal>())).ReturnsAsync(new UserModel { Id = specificPost.AuthorId });
+		PostsController controller = new(_postRepoMock.Object, _userRepoMock.Object);
+
+		// Act
+		var result = await controller.EditConfirmed(specificPost.Id, updatedPostDto) as RedirectToActionResult;
+
+		// Assert
+		Assert.That(result, Is.Not.Null);
+		_postRepoMock.VerifyAll();
+	}
+
+	[Test]
+	public async Task EditConfirmed_ReturnsNotFound_WhenPostDoesNotExist()
+	{
+		// Arrange
+		const int invalidPostId = -1;
+		_postRepoMock.Setup(repo => repo.GetPostByIdAsync(invalidPostId)).ReturnsAsync((PostModel?)null);
+		PostsController controller = new(_postRepoMock.Object, _userRepoMock.Object);
+
+		// Act
+		var result = await controller.EditConfirmed(invalidPostId, new PostDTO()) as NotFoundResult;
+
+		// Assert
+		Assert.That(result, Is.Not.Null);
+	}
+
+	[Test]
+	public async Task EditConfirmed_ReturnsForbid_WhenUserIsNotAuthor()
+	{
+		// Arrange
+		string actualAuthorId = Guid.NewGuid().ToString();
+		var fakePosts = GenerateFakePosts();
+		var specificPost = fakePosts.First();
+		_postRepoMock.Setup(repo => repo.GetPostByIdAsync(specificPost.Id)).ReturnsAsync(specificPost);
+		_userRepoMock.Setup(repo => repo.GetUserByClaimAsync(It.IsAny<ClaimsPrincipal>())).ReturnsAsync(new UserModel { Id = actualAuthorId });
+		PostsController controller = new(_postRepoMock.Object, _userRepoMock.Object);
+
+		// Act
+		var result = await controller.EditConfirmed(specificPost.Id, new PostDTO()) as ForbidResult;
+
+		// Assert
+		Assert.That(result, Is.Not.Null);
+	}
+
+	[Test]
 	public async Task Delete_ShowsDeleteConfirmation_WhenSuppliedAValidPostIdAndIsAuthor()
 	{
 		// Arrange

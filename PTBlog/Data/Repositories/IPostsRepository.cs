@@ -9,5 +9,7 @@ public interface IPostsRepository
 
 	public Task AddPostAsync(PostModel post);
 
+	public Task UpdatePostAsync(PostModel post);
+
 	public Task DeletePostAsync(PostModel post);
 }
