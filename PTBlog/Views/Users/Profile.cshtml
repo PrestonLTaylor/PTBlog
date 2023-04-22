@@ -8,6 +8,13 @@
 
 	<img class="profile-picture" src="@Model.ProfilePictureURL" alt="@Model.Username's Profile Picture" />
 
-	<h2 class="profile-posts">@Model.Username's Posts</h2>
-	@await Html.PartialAsync("~/Views/Posts/_PostsTablePartial.cshtml", Model.Posts)
+	@if (Model.Posts.Any())
+	{
+		<h2 class="profile-posts">@Model.Username's Posts</h2>
+		@await Html.PartialAsync("~/Views/Posts/_PostsTablePartial.cshtml", Model.Posts)
+	}
+	else
+	{
+		<h2>This user has no posts!</h2>
+	}
 </section>
