@@ -31,6 +31,12 @@ public sealed class PostsRepository : IPostsRepository
 		await _dbContext.SaveChangesAsync();
 	}
 
+	public async Task UpdatePostAsync(PostModel updatedPost)
+	{
+		_dbContext.Posts.Update(updatedPost);
+		await _dbContext.SaveChangesAsync();
+	}
+
 	public async Task DeletePostAsync(PostModel model)
 	{
 		_dbContext.Posts.Remove(model);
