@@ -1,4 +1,5 @@
 ﻿@model PostModel
+@using Westwind.AspNetCore.Markdown
 @{
 	ViewData["Title"] = Model.Title;
 }
@@ -9,7 +10,7 @@
 		By <a asp-area="" asp-controller="Users" asp-action="Profile" asp-route-id="@Model.Author.Id">@Model.Author.Username</a>
 	</p>
 
-	<pre>@Model.Content</pre>
+	@Markdown.ParseHtmlString(Model.Content)
 
 	<details>
 		<p>Created On: @Html.DisplayFor(p => p.CreatedDate)</p>
@@ -22,3 +23,7 @@
 		@await Html.PartialAsync("~/Views/Posts/_PostActionButtonsPartial.cshtml")
 	</details>
 </article>
+
+@section Scripts {
+	<partial name="_SyntaxHighlightingPartial" />	
+}

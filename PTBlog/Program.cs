@@ -2,6 +2,8 @@ using PTBlog.Data;
 using PTBlog.Models;
 using Microsoft.EntityFrameworkCore;
 using PTBlog.Data.Repositories;
+using Westwind.AspNetCore.Markdown;
+using Markdig;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +23,11 @@ builder.Services.AddRazorPages();
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
 
+builder.Services.AddMarkdown(options =>
+{
+    options.ConfigureMarkdigPipeline = builder => { builder.DisableHtml(); };
+});
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -32,6 +39,8 @@ else
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
+
+app.UseMarkdown();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
