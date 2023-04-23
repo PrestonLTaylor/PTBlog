@@ -75,7 +75,7 @@ public sealed class PostsController : Controller
 		return View(new PostDTO{ Title = post.Title, Content = post.Content });
     }
 
-    [HttpPost("{action}/{id}")]
+    [HttpPost("Edit/{id}")]
     [Authorize]
     public async Task<IActionResult> EditConfirmed(int id, [Bind("Title,Content")]PostDTO postDto)
     {
