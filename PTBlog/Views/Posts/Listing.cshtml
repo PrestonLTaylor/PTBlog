@@ -14,5 +14,7 @@
 	<details>
 		<p>Created On: @Html.DisplayFor(p => p.CreatedDate)</p>
 		<p>Updated On: @Html.DisplayFor(p => p.UpdatedDate)</p>
+		<h2>Actions:</h2>
+		@await Html.PartialAsync("~/Views/Posts/_PostActionButtonsPartial.cshtml")
 	</details>
 </article>
