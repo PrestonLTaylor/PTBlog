@@ -23,3 +23,16 @@
 		@await Html.PartialAsync("~/Views/Posts/_PostActionButtonsPartial.cshtml")
 	</details>
 </article>
+
+@section Scripts {
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet" />
+	<script>
+		setTimeout(function () {
+			var pres = document.querySelectorAll("pre>code");
+			for (var i = 0; i < pres.length; i++) {
+				hljs.highlightBlock(pres[i]);
+			}
+		});
+	</script>
+}
