@@ -15,6 +15,13 @@ async function UpdatePreviewContent() {
 	let postPreviewContent = document.querySelector(".post-preview-content");
 	let content = await RenderMarkdown(document.querySelector(".content-input").value);
 	postPreviewContent.innerHTML = content;
+
+	setTimeout(function () {
+		var pres = postPreviewContent.querySelectorAll("pre>code");
+		for (var i = 0; i < pres.length; i++) {
+			hljs.highlightBlock(pres[i]);
+		}
+	});
 }
 
 async function RenderMarkdown(rawMarkdown) {
