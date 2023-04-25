@@ -1,4 +1,9 @@
 ﻿@model PostModel
+@using PTBlog.Data.Repositories
+@inject IUsersRepository usersRepo
 
-<a class="btn btn-outline-info" asp-controller="Posts" asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
-<a class="btn btn-outline-danger" asp-controller="Posts" asp-action="Delete" asp-route-id="@Model.Id">Delete</a>
+@if (await usersRepo.IsClaimAuthorOfPostAsync(User, Model))
+{
+	<a class="btn btn-outline-info" asp-controller="Posts" asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
+	<a class="btn btn-outline-danger" asp-controller="Posts" asp-action="Delete" asp-route-id="@Model.Id">Delete</a>
+}

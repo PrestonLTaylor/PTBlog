@@ -39,6 +39,12 @@ public sealed class UsersRepository : IUsersRepository
 		return _dbContext.Users.Include(u => u.Posts);
 	}
 
+	public async Task<bool> IsClaimAuthorOfPostAsync(ClaimsPrincipal claim, PostModel post)
+	{
+		var user = await GetUserByClaimAsync(claim);
+		return user?.Id == post.AuthorId;
+	}
+
 	private readonly DatabaseContext _dbContext;
 	private readonly UserManager<UserModel> _userManager;
 }
