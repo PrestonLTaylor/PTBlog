@@ -11,7 +11,7 @@
 	@if (Model.Posts.Any())
 	{
 		<h2 class="profile-posts">@Model.Username's Posts</h2>
-		@await Html.PartialAsync("~/Views/Posts/_PostsTablePartial.cshtml", Model.Posts)
+		@await Html.PartialAsync("~/Views/Posts/_PostsCardPartial.cshtml", Model.Posts)
 	}
 	else
 	{
