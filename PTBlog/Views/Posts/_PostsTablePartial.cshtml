@@ -1,40 +1,12 @@
 ﻿@model IEnumerable<PostModel>
 
-<table class="table">
-	<thead>
-		<tr>
-			<th>@Html.DisplayNameFor(model => model.Id)</th>
-			<th>@Html.DisplayNameFor(model => model.Author)</th>
-			<th>@Html.DisplayNameFor(model => model.Title)</th>
-			<th>@Html.DisplayNameFor(model => model.CreatedDate)</th>
-			<th>@Html.DisplayNameFor(model => model.UpdatedDate)</th>
-			<th>Actions</th>
-		</tr>
-	</thead>
-
-	<tbody>
-		@foreach (var post in Model)
-		{
-			<tr>
-				<td class="align-middle">
-					@Html.DisplayFor(model => post.Id)
-				</td>
-				<td class="align-middle">
-					@Html.DisplayFor(model => post.Author.Username)
-				</td>
-				<td class="align-middle">
-					<a asp-area="" asp-controller="Posts" asp-action="Listing" asp-route-id="@post.Id">@Html.DisplayFor(model => post.Title)</a>
-				</td>
-				<td class="align-middle">
-					@Html.DisplayFor(model => post.CreatedDate)
-				</td>
-				<td class="align-middle">
-					@Html.DisplayFor(model => post.UpdatedDate)
-				</td>
-				<td class="align-middle">
-					@await Html.PartialAsync("~/Views/Posts/_PostActionButtonsPartial.cshtml", post)
-				</td>
-			</tr>
-		}
-	</tbody>
-</table>
+<hr class="hr" />
+@foreach (var post in Model)
+{
+	<div class="post-card">
+		<h2><cite>@post.Title</cite> By @post.Author.Username</h2>
+		<a asp-area="" asp-controller="Posts" asp-action="Listing" asp-route-id="@post.Id">READ BLOG</a>
+		<p>Created at: @Html.DisplayFor(model => post.CreatedDate)</p>
+	</div>
+	<hr class="hr" />
+}
