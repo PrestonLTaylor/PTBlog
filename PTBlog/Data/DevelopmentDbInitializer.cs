@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using PTBlog.Claims;
 using PTBlog.Models;
 using System.Security.Claims;
 
@@ -39,7 +40,7 @@ public static class DevelopmentDbInitializerExtensions
 
         const string password = "TestPassword1!";
         await userManager.CreateAsync(user, password);
-        await userManager.AddClaimAsync(user, new Claim("isAdmin", isAdmin.ToString()));
+        await userManager.AddClaimAsync(user, new Claim(IsAdminClaim.Name, isAdmin.ToString()));
 
         return userId;
     }
