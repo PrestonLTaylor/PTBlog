@@ -34,4 +34,9 @@ public sealed class PostModel
 
 		return false;
 	}
+
+	public override int GetHashCode()
+	{
+		return HashCode.Combine(Title, Content, AuthorId);
+	}
 }
