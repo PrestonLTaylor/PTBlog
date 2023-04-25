@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - PTBlog</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.4/font/bootstrap-icons.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/PTBlog.styles.css" asp-append-version="true" />
 </head>
@@ -30,6 +31,13 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Users">Users</a>
                         </li>
                     </ul>
+                </div>
+
+                <div class="navbar-nav search-bar input-group">
+                    <input type="text" class="form-control" placeholder="Search for blog..." aria-label="Blog search" aria-describedby="basic-addon2">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button"><i class="bi bi-search"></i></button>
+                    </div>
                 </div>
 
                 <partial name="_LoginPartial">
