@@ -176,8 +176,7 @@ public sealed class PostsController : Controller
 
 	private async Task<bool> IsNotUsersPostAsync(PostModel post)
     {
-        var user = await _usersRepository.GetUserByClaimAsync(User);
-        return post.AuthorId != user!.Id;
+        return !await _usersRepository.IsClaimAuthorOfPostAsync(User, post);
 	}
 
     private IActionResult RedirectToListings()
