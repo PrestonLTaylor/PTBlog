@@ -1,8 +1,6 @@
 ﻿@model BlogSearchDTO
 
-<form class="navbar-nav search-bar input-group" asp-controller="Posts" asp-action="Search">
+<form class="navbar-nav search-bar" asp-controller="Posts" asp-action="Search">
     <input asp-for="TitleWanted" type="text" class="form-control" placeholder="Search for blog..." aria-label="Blog search" aria-describedby="basic-addon2">
-    <div class="input-group-append">
-        <input type="submit" value="Search" class="btn btn-outline-primary" />
-    </div>
+    <input type="submit" value="Search" class="btn btn-outline-primary" />
 </form>
