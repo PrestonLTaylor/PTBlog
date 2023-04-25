@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using PTBlog.Claims;
 using PTBlog.Models;
 using System.Security.Claims;
@@ -7,26 +8,37 @@ namespace PTBlog.Data;
 
 public static class DevelopmentDbInitializerExtensions
 {
-    static public async Task<WebApplication> UseDatabaseSeedingAsync(this WebApplication app)
+    static public async Task<WebApplication> UseDatabaseSeedingAsync(this WebApplication app, bool isDevelopment)
     {
         using var scope = app.Services.CreateScope();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserModel>>();
         var dbContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
-        dbContext.Database.EnsureCreated();
 
-        if (!dbContext.Users.Any())
+        if (isDevelopment)
         {
-            await CreateDefaultUserWithNameAsync(userManager, "Owner", isAdmin: true);
-            var blogger1Id = await CreateDefaultUserWithNameAsync(userManager, "Blogger1", isAdmin: false);
-            var blogger2Id = await CreateDefaultUserWithNameAsync(userManager, "Blogger2", isAdmin: false);
+            await ResetDatabaseAndSeedDefaultUsersAsync(userManager, dbContext);
+		}
 
-            CreateDefaultPostWithAuthor(dbContext, blogger1Id);
-            CreateDefaultPostWithAuthor(dbContext, blogger2Id);
-            await dbContext.SaveChangesAsync();
-        }
-
-        return app;
+	    return app;
     }
+
+    static private async Task ResetDatabaseAndSeedDefaultUsersAsync(UserManager<UserModel> userManager, DatabaseContext dbContext)
+    {
+		await dbContext.Database.EnsureDeletedAsync();
+		await dbContext.Database.EnsureCreatedAsync();
+
+		if (!dbContext.Users.Any())
+		{
+			await CreateDefaultUserWithNameAsync(userManager, "Owner", isAdmin: true);
+			var blogger1Id = await CreateDefaultUserWithNameAsync(userManager, "Blogger1", isAdmin: false);
+			var blogger2Id = await CreateDefaultUserWithNameAsync(userManager, "Blogger2", isAdmin: false);
+
+			CreateDefaultPostWithAuthor(dbContext, blogger1Id);
+			CreateDefaultPostWithAuthor(dbContext, blogger2Id);
+
+			await dbContext.SaveChangesAsync();
+		}
+	}
 
     static private async Task<string> CreateDefaultUserWithNameAsync(UserManager<UserModel> userManager, string username, bool isAdmin)
     {
@@ -40,9 +52,9 @@ public static class DevelopmentDbInitializerExtensions
 
         const string password = "TestPassword1!";
         await userManager.CreateAsync(user, password);
-        await userManager.AddClaimAsync(user, new Claim(IsAdminClaim.Name, isAdmin.ToString()));
+		await userManager.AddClaimAsync(user, new Claim(IsAdminClaim.Name, isAdmin.ToString()));
 
-        return userId;
+		return userId;
     }
 
     static private void CreateDefaultPostWithAuthor(DatabaseContext context, string authorId)
