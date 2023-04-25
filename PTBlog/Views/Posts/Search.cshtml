@@ -1,0 +1,15 @@
+﻿@model IEnumerable<PostModel>
+@{
+	var titleWanted = ViewData["TitleWanted"];
+	ViewData["Title"] = $"Results for {titleWanted}";
+}
+
+@if (Model.Any())
+{
+	<h1>Search results for @titleWanted!</h1>
+	@await Html.PartialAsync("~/Views/Posts/_PostsTablePartial.cshtml")
+}
+else
+{
+	<h1>Search for @titleWanted has no results!</h1>
+}
