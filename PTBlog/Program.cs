@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using PTBlog.Data.Repositories;
 using Westwind.AspNetCore.Markdown;
 using Markdig;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +14,7 @@ builder.Services.AddDbContext<DatabaseContext>(options =>
     options.UseNpgsql(connectionString);
 });
 
-builder.Services.AddDefaultIdentity<UserModel>().AddEntityFrameworkStores<DatabaseContext>();
+builder.Services.AddDefaultIdentity<UserModel>().AddRoles<IdentityRole>().AddEntityFrameworkStores<DatabaseContext>();
 
 builder.Services.AddRepositoriesSerivces();
 builder.Services.AddControllersWithViews();
@@ -30,11 +31,9 @@ builder.Services.AddMarkdown(options =>
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    await app.UseDatabaseSeedingAsync();
-}
-else
+await app.UseDatabaseSeedingAsync(app.Environment.IsDevelopment());
+
+if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();

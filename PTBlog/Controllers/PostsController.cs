@@ -74,7 +74,7 @@ public sealed class PostsController : Controller
 		{
 			return NotFound();
 		}
-		if (await IsNotUsersPostAsync(post))
+		if (!await DoesUserHaveAccessToPost(post))
 		{
 			return Forbid();
 		}
@@ -96,7 +96,7 @@ public sealed class PostsController : Controller
         {
             return NotFound();
         }
-		if (await IsNotUsersPostAsync(post))
+		if (!await DoesUserHaveAccessToPost(post))
 		{
 			return Forbid();
 		}
@@ -116,7 +116,7 @@ public sealed class PostsController : Controller
         {
             return NotFound();
         }
-        if (await IsNotUsersPostAsync(post))
+        if (!await DoesUserHaveAccessToPost(post))
         {
             return Forbid();
         }
@@ -133,7 +133,7 @@ public sealed class PostsController : Controller
 		{
 			return NotFound();
 		}
-		if (await IsNotUsersPostAsync(post))
+		if (!await DoesUserHaveAccessToPost(post))
 		{
 			return Forbid();
 		}
@@ -174,9 +174,9 @@ public sealed class PostsController : Controller
 		post.Content = postDto.Content;
 	}
 
-	private async Task<bool> IsNotUsersPostAsync(PostModel post)
+	private async Task<bool> DoesUserHaveAccessToPost(PostModel post)
     {
-        return !await _usersRepository.IsClaimAuthorOfPostAsync(User, post);
+        return await _usersRepository.DoesClaimHaveAccessToPost(User, post);
 	}
 
     private IActionResult RedirectToListings()

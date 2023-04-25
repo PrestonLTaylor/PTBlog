@@ -118,7 +118,7 @@ internal class PostsControllerTest
 		var fakePosts = GenerateFakePosts();
 		var specificPost = fakePosts.First();
 		_postRepoMock.Setup(repo => repo.GetPostByIdAsync(specificPost.Id)).ReturnsAsync(specificPost);
-		_userRepoMock.Setup(repo => repo.IsClaimAuthorOfPostAsync(It.IsAny<ClaimsPrincipal>(), specificPost)).ReturnsAsync(false);
+		_userRepoMock.Setup(repo => repo.DoesClaimHaveAccessToPost(It.IsAny<ClaimsPrincipal>(), specificPost)).ReturnsAsync(false);
 		PostsController controller = new(_postRepoMock.Object, _userRepoMock.Object);
 
 		// Act
@@ -144,13 +144,13 @@ internal class PostsControllerTest
 	}
 
 	[Test]
-	public async Task Edit_ShowsEditPageWithCorrectPost_WhenSuppliedAValidPostIdAndIsAuthor()
+	public async Task Edit_ShowsEditPageWithCorrectPost_WhenSuppliedAValidPostIdAndHasAccess()
 	{
 		// Arrange
 		var fakePosts = GenerateFakePosts();
 		var specificPost = fakePosts.First();
 		_postRepoMock.Setup(repo => repo.GetPostByIdAsync(specificPost.Id)).ReturnsAsync(specificPost);
-		_userRepoMock.Setup(repo => repo.IsClaimAuthorOfPostAsync(It.IsAny<ClaimsPrincipal>(), specificPost)).ReturnsAsync(true);
+		_userRepoMock.Setup(repo => repo.DoesClaimHaveAccessToPost(It.IsAny<ClaimsPrincipal>(), specificPost)).ReturnsAsync(true);
 		PostsController controller = new(_postRepoMock.Object, _userRepoMock.Object);
 
 		// Act
@@ -166,7 +166,7 @@ internal class PostsControllerTest
 	}
 
 	[Test]
-	public async Task EditConfirmed_EditsAPost_WhenSuppliedAValidPostIdAndIsAuthor()
+	public async Task EditConfirmed_EditsAPost_WhenSuppliedAValidPostIdAndHasAccess()
 	{
 		// Arrange
 		var fakePosts = GenerateFakePosts();
@@ -175,7 +175,7 @@ internal class PostsControllerTest
 		var updatedPostDto = new PostDTO { Title = updatedPost.Title, Content = updatedPost.Content };
 		_postRepoMock.Setup(repo => repo.GetPostByIdAsync(specificPost.Id)).ReturnsAsync(specificPost);
 		_postRepoMock.Setup(repo => repo.UpdatePostAsync(It.Is<PostModel>(post => post.Equals(updatedPost)))).Verifiable();
-		_userRepoMock.Setup(repo => repo.IsClaimAuthorOfPostAsync(It.IsAny<ClaimsPrincipal>(), specificPost)).ReturnsAsync(true);
+		_userRepoMock.Setup(repo => repo.DoesClaimHaveAccessToPost(It.IsAny<ClaimsPrincipal>(), specificPost)).ReturnsAsync(true);
 		PostsController controller = new(_postRepoMock.Object, _userRepoMock.Object);
 
 		// Act
@@ -223,13 +223,13 @@ internal class PostsControllerTest
 	}
 
 	[Test]
-	public async Task Delete_ShowsDeleteConfirmation_WhenSuppliedAValidPostIdAndIsAuthor()
+	public async Task Delete_ShowsDeleteConfirmation_WhenSuppliedAValidPostIdAndHasAccess()
 	{
 		// Arrange
 		var fakePosts = GenerateFakePosts();
 		var specificPost = fakePosts.First();
 		_postRepoMock.Setup(repo => repo.GetPostByIdAsync(specificPost.Id)).ReturnsAsync(specificPost);
-		_userRepoMock.Setup(repo => repo.IsClaimAuthorOfPostAsync(It.IsAny<ClaimsPrincipal>(), specificPost)).ReturnsAsync(true);
+		_userRepoMock.Setup(repo => repo.DoesClaimHaveAccessToPost(It.IsAny<ClaimsPrincipal>(), specificPost)).ReturnsAsync(true);
 		PostsController controller = new(_postRepoMock.Object, _userRepoMock.Object);
 
 		// Act
@@ -278,14 +278,14 @@ internal class PostsControllerTest
 	}
 
 	[Test]
-	public async Task DeleteConfirmed_DeletesAPost_WhenSuppliedAValidPostIdAndIsAuthor()
+	public async Task DeleteConfirmed_DeletesAPost_WhenSuppliedAValidPostIdAndHasAccess()
 	{
 		// Arrange
 		var fakePosts = GenerateFakePosts();
 		var specificPost = fakePosts.First();
 		_postRepoMock.Setup(repo => repo.GetPostByIdAsync(specificPost.Id)).ReturnsAsync(specificPost);
 		_postRepoMock.Setup(repo => repo.DeletePostAsync(It.Is<PostModel>(post => post.Equals(specificPost)))).Verifiable();
-		_userRepoMock.Setup(repo => repo.IsClaimAuthorOfPostAsync(It.IsAny<ClaimsPrincipal>(), specificPost)).ReturnsAsync(true);
+		_userRepoMock.Setup(repo => repo.DoesClaimHaveAccessToPost(It.IsAny<ClaimsPrincipal>(), specificPost)).ReturnsAsync(true);
 		PostsController controller = new(_postRepoMock.Object, _userRepoMock.Object);
 
 		// Act
@@ -322,7 +322,7 @@ internal class PostsControllerTest
 		var fakePosts = GenerateFakePosts();
 		var specificPost = fakePosts.First();
 		_postRepoMock.Setup(repo => repo.GetPostByIdAsync(specificPost.Id)).ReturnsAsync(specificPost);
-		_userRepoMock.Setup(repo => repo.IsClaimAuthorOfPostAsync(It.IsAny<ClaimsPrincipal>(), specificPost)).ReturnsAsync(false);
+		_userRepoMock.Setup(repo => repo.DoesClaimHaveAccessToPost(It.IsAny<ClaimsPrincipal>(), specificPost)).ReturnsAsync(false);
 		PostsController controller = new(_postRepoMock.Object, _userRepoMock.Object);
 
 		// Act
