@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using PTBlog.Claims;
 using PTBlog.Models;
 using System.Security.Claims;
 
@@ -39,8 +40,13 @@ public sealed class UsersRepository : IUsersRepository
 		return _dbContext.Users.Include(u => u.Posts);
 	}
 
-	public async Task<bool> IsClaimAuthorOfPostAsync(ClaimsPrincipal claim, PostModel post)
+	public async Task<bool> DoesClaimHaveAccessToPost(ClaimsPrincipal claim, PostModel post)
 	{
+		if (IsAdminClaim.IsUserAnAdmin(claim))
+		{
+			return true;
+		}
+
 		var user = await GetUserByClaimAsync(claim);
 		return user?.Id == post.AuthorId;
 	}

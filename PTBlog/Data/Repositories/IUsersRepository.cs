@@ -9,5 +9,5 @@ public interface IUsersRepository
 	public Task<UserModel?> GetUserByIdAsync(string? id);
 	public Task<UserModel?> GetUserByClaimAsync(ClaimsPrincipal claim);
 
-	public Task<bool> IsClaimAuthorOfPostAsync(ClaimsPrincipal claim, PostModel post);
+	public Task<bool> DoesClaimHaveAccessToPost(ClaimsPrincipal claim, PostModel post);
 }
