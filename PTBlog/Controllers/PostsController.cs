@@ -17,7 +17,7 @@ public sealed class PostsController : Controller
     }
 
     [Route("")]
-    [Route("Listings")]
+    [Route("{action}")]
     public async Task<IActionResult> Listings()
     {
         var posts = await _postsRepository.GetPostsAsync();
