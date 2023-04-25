@@ -14,8 +14,8 @@ public static class DevelopmentDbInitializerExtensions
 
         if (!dbContext.Users.Any())
         {
-            var blogger1Id = CreateDefaultUserWithName(userManager, "Blogger1");
-            var blogger2Id = CreateDefaultUserWithName(userManager, "Blogger2");
+            var blogger1Id = await CreateDefaultUserWithNameAsync(userManager, "Blogger1");
+            var blogger2Id = await CreateDefaultUserWithNameAsync(userManager, "Blogger2");
 
             CreateDefaultPostWithAuthor(dbContext, blogger1Id);
             CreateDefaultPostWithAuthor(dbContext, blogger2Id);
@@ -25,7 +25,7 @@ public static class DevelopmentDbInitializerExtensions
         return app;
     }
 
-    static private string CreateDefaultUserWithName(UserManager<UserModel> userManager, string username)
+    static private async Task<string> CreateDefaultUserWithNameAsync(UserManager<UserModel> userManager, string username)
     {
         var userId = Guid.NewGuid().ToString();
         var user = new UserModel()
@@ -36,7 +36,7 @@ public static class DevelopmentDbInitializerExtensions
         };
 
         const string password = "TestPassword1!";
-        userManager.CreateAsync(user, password);
+        await userManager.CreateAsync(user, password);
 
         return userId;
     }
