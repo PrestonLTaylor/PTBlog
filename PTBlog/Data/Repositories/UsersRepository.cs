@@ -42,7 +42,7 @@ public sealed class UsersRepository : IUsersRepository
 
 	public async Task<bool> DoesClaimHaveAccessToPost(ClaimsPrincipal claim, PostModel post)
 	{
-		if (IsAdminClaim.IsUserAnAdmin(claim))
+		if (IsAdminRole.IsUserAnAdmin(claim))
 		{
 			return true;
 		}

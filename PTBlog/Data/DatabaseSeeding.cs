@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using PTBlog.Claims;
 using PTBlog.Models;
 using System.Security.Claims;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace PTBlog.Data;
 
@@ -11,21 +13,29 @@ public static class DevelopmentDbInitializerExtensions
     static public async Task<WebApplication> UseDatabaseSeedingAsync(this WebApplication app, bool isDevelopment)
     {
         using var scope = app.Services.CreateScope();
-        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserModel>>();
         var dbContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
 
         if (isDevelopment)
         {
-            await ResetDatabaseAndSeedDefaultUsersAsync(userManager, dbContext);
-		}
+            await ResetDatabaseAndSeedDefaultUsersAsync(scope, dbContext);
+        }
+        else
+        {
+            await AddAdminRoleAsync(scope, dbContext);
+        }
 
-	    return app;
+        await dbContext.SaveChangesAsync();
+		return app;
     }
 
-    static private async Task ResetDatabaseAndSeedDefaultUsersAsync(UserManager<UserModel> userManager, DatabaseContext dbContext)
+    static private async Task ResetDatabaseAndSeedDefaultUsersAsync(IServiceScope scope, DatabaseContext dbContext)
     {
+		var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserModel>>();
+
 		await dbContext.Database.EnsureDeletedAsync();
 		await dbContext.Database.EnsureCreatedAsync();
+
+		await AddAdminRoleAsync(scope, dbContext);
 
 		if (!dbContext.Users.Any())
 		{
@@ -35,8 +45,6 @@ public static class DevelopmentDbInitializerExtensions
 
 			CreateDefaultPostWithAuthor(dbContext, blogger1Id);
 			CreateDefaultPostWithAuthor(dbContext, blogger2Id);
-
-			await dbContext.SaveChangesAsync();
 		}
 	}
 
@@ -52,9 +60,13 @@ public static class DevelopmentDbInitializerExtensions
 
         const string password = "TestPassword1!";
         await userManager.CreateAsync(user, password);
-		await userManager.AddClaimAsync(user, new Claim(IsAdminClaim.Name, isAdmin.ToString()));
 
-		return userId;
+        if (isAdmin)
+        {
+            await userManager.AddToRoleAsync(user, IsAdminRole.Name);
+        }
+
+        return userId;
     }
 
     static private void CreateDefaultPostWithAuthor(DatabaseContext context, string authorId)
@@ -68,4 +80,13 @@ public static class DevelopmentDbInitializerExtensions
             UpdatedDate = DateTimeOffset.UtcNow,
         });
     }
+
+    static private async Task AddAdminRoleAsync(IServiceScope scope, DatabaseContext context)
+	{
+		var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+		if (!await roleManager.RoleExistsAsync(IsAdminRole.Name))
+		{
+			await roleManager.CreateAsync(new IdentityRole(IsAdminRole.Name));
+		}
+	}
 }
