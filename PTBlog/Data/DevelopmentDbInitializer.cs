@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using PTBlog.Models;
+using System.Security.Claims;
 
 namespace PTBlog.Data;
 
@@ -14,8 +15,9 @@ public static class DevelopmentDbInitializerExtensions
 
         if (!dbContext.Users.Any())
         {
-            var blogger1Id = await CreateDefaultUserWithNameAsync(userManager, "Blogger1");
-            var blogger2Id = await CreateDefaultUserWithNameAsync(userManager, "Blogger2");
+            await CreateDefaultUserWithNameAsync(userManager, "Owner", isAdmin: true);
+            var blogger1Id = await CreateDefaultUserWithNameAsync(userManager, "Blogger1", isAdmin: false);
+            var blogger2Id = await CreateDefaultUserWithNameAsync(userManager, "Blogger2", isAdmin: false);
 
             CreateDefaultPostWithAuthor(dbContext, blogger1Id);
             CreateDefaultPostWithAuthor(dbContext, blogger2Id);
@@ -25,7 +27,7 @@ public static class DevelopmentDbInitializerExtensions
         return app;
     }
 
-    static private async Task<string> CreateDefaultUserWithNameAsync(UserManager<UserModel> userManager, string username)
+    static private async Task<string> CreateDefaultUserWithNameAsync(UserManager<UserModel> userManager, string username, bool isAdmin)
     {
         var userId = Guid.NewGuid().ToString();
         var user = new UserModel()
@@ -37,6 +39,7 @@ public static class DevelopmentDbInitializerExtensions
 
         const string password = "TestPassword1!";
         await userManager.CreateAsync(user, password);
+        await userManager.AddClaimAsync(user, new Claim("isAdmin", isAdmin.ToString()));
 
         return userId;
     }
