@@ -12,12 +12,12 @@ public sealed class PostsRepository : IPostsRepository
 
 	public async Task<List<PostModel>> GetPostsAsync()
 	{
-		return await GetPostsWithTheirRelations().ToListAsync();
+		return await GetPostsOrderedByCreationDate().ToListAsync();
 	}
 
 	public async Task<List<PostModel>> GetPostsByTitleAsync(string wantedTitle)
 	{
-		return await GetPostsWithTheirRelations().Where(x => x.Title.Contains(wantedTitle)).ToListAsync();
+		return await GetPostsOrderedByCreationDate().Where(x => x.Title.Contains(wantedTitle)).ToListAsync();
 	}
 
 	public async Task<PostModel?> GetPostByIdAsync(int? postId)
@@ -51,6 +51,11 @@ public sealed class PostsRepository : IPostsRepository
 	private IQueryable<PostModel> GetPostsWithTheirRelations()
 	{
 		return _dbContext.Posts.Include(p => p.Author);
+	}
+
+	private IQueryable<PostModel> GetPostsOrderedByCreationDate()
+	{
+		return GetPostsWithTheirRelations().OrderByDescending(p => p.CreatedDate);
 	}
 
 	private readonly DatabaseContext _dbContext;
