@@ -32,6 +32,8 @@
                     </ul>
                 </div>
 
+                @await Html.PartialAsync("~/Views/Shared/_SearchBarPartial.cshtml", new BlogSearchDTO(""))
+
                 <partial name="_LoginPartial">
             </div>
         </nav>

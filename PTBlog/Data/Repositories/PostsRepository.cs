@@ -15,6 +15,11 @@ public sealed class PostsRepository : IPostsRepository
 		return await GetPostsWithTheirRelations().ToListAsync();
 	}
 
+	public async Task<List<PostModel>> GetPostsByTitleAsync(string wantedTitle)
+	{
+		return await GetPostsWithTheirRelations().Where(x => x.Title.Contains(wantedTitle)).ToListAsync();
+	}
+
 	public async Task<PostModel?> GetPostByIdAsync(int? postId)
 	{
 		if (postId is null)

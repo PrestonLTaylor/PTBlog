@@ -36,6 +36,13 @@ public sealed class PostsController : Controller
         return View(post);
     }
 
+    [Route("{action}")]
+    public async Task<IActionResult> Search(BlogSearchDTO blogSearch)
+    {
+        var posts = await _postsRepository.GetPostsByTitleAsync(blogSearch.TitleWanted);
+        ViewData["TitleWanted"] = blogSearch.TitleWanted;
+        return View(posts);
+    }
 
     [Route("{action}")]
     [Authorize]

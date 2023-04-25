@@ -59,6 +59,40 @@ internal class PostsControllerTest
 	}
 
 	[Test]
+	public async Task Search_ReturnsOnlyPosts_WhenPostsHaveTitleContaining()
+	{
+		// Arrange
+		var fakePosts = GenerateFakePosts();
+		var specificPost = fakePosts.First();
+		_postRepoMock.Setup(repo => repo.GetPostsByTitleAsync(specificPost.Title)).ReturnsAsync(new List<PostModel> { specificPost });
+		PostsController controller = new(_postRepoMock.Object, _userRepoMock.Object);
+
+		// Act
+		var result = await controller.Search(new BlogSearchDTO(specificPost.Title)) as ViewResult;
+		var resultsModel = result?.ViewData.Model as List<PostModel>;
+
+		// Assert
+		Assert.That(resultsModel, Is.Not.Null);
+		Assert.That(resultsModel.Single(), Is.EqualTo(specificPost));
+	}
+
+	[Test]
+	public async Task Search_ReturnsNoPosts_WhenNoPostsExistWithTitle()
+	{
+		// Arrange
+		_postRepoMock.Setup(repo => repo.GetPostsByTitleAsync(It.IsAny<string>())).ReturnsAsync(new List<PostModel> {});
+		PostsController controller = new(_postRepoMock.Object, _userRepoMock.Object);
+
+		// Act
+		var result = await controller.Search(new BlogSearchDTO("Fake Post")) as ViewResult;
+		var resultsModel = result?.ViewData.Model as List<PostModel>;
+
+		// Assert
+		Assert.That(resultsModel, Is.Not.Null);
+		Assert.That(resultsModel.Any(), Is.False);
+	}
+
+	[Test]
 	public async Task Create_CreatesPost_WhenSuppliedValidPost()
 	{
 		// Arrange
