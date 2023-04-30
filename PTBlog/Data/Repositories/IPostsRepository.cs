@@ -5,7 +5,8 @@ namespace PTBlog.Data.Repositories;
 public interface IPostsRepository
 {
 	public Task<List<PostModel>> GetPostsAsync();
-	public Task<List<PostModel>> GetPostsByTitleAsync(string titleWanted);
+	public Task<PostModel?> GetLatestPostAsync();
+    public Task<List<PostModel>> GetPostsByTitleAsync(string titleWanted);
 	public Task<PostModel?> GetPostByIdAsync(int? postId);
 
 	public Task AddPostAsync(PostModel post);
