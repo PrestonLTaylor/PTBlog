@@ -1,8 +1,20 @@
-﻿@{
+﻿@using PTBlog.Data.Repositories
+@inject IPostsRepository repo
+@{
     ViewData["Title"] = "Home Page";
+
+    var latestPost = await repo.GetLatestPostAsync();
 }
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <p>Welcome to PTBlog, my personal ASP.NET blogging web application.</p>
+
+    @if (latestPost is not null)
+    {
+        <hr class="hr" />
+
+        <h2 class ="display-5">Latest Post</h2>
+        <a asp-area="" asp-controller="Posts" asp-action="Listing" asp-route-id="@latestPost.Id"><cite>@latestPost.Title</cite> by: @latestPost.Author.Username</a>
+    }
 </div>
