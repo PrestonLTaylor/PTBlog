@@ -5,11 +5,20 @@
 @inject UserManager<UserModel> UserManager
 
 @{
+    var isSignedIn = SignInManager.IsSignedIn(User);
     var userModel = await UserManager.GetUserAsync(User);
+
+    // If a user gets deleted, but the client browser still has the sign in cookies then isSignedIn will be true
+    // This will cause a crash when we try to access the user as it will be null.
+    if (isSignedIn && userModel is null)
+    {
+        await SignInManager.SignOutAsync();
+        isSignedIn = false;
+    }
 }
 
 <ul class="navbar-nav">
-@if (SignInManager.IsSignedIn(User))
+@if (isSignedIn)
 {
     <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
