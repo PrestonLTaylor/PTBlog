@@ -15,6 +15,18 @@ public static class PostsEndpointsExtensions
             return Results.Ok(postDtos);
         });
 
+        app.MapGet(APIRoutes.Posts.Get, async (IPostsRepository repo, int postId) =>
+        {
+            var post = await repo.GetPostByIdAsync(postId);
+            if (post is null)
+            {
+                return Results.NotFound();
+            }
+
+            var postDto = new PostDTO(post.Title, post.Content);
+            return Results.Ok(postDto);
+        });
+
         return app;
     }
 }

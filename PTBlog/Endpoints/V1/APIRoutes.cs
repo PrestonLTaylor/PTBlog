@@ -9,5 +9,6 @@ public static class APIRoutes
     public static class Posts
     {
         public const string GetAll = $"{Base}/posts";
+        public const string Get = $"{Base}/posts/{{postId}}";
     }
 }
