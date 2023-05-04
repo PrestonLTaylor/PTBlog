@@ -5,7 +5,7 @@ using PTBlog.Data.Repositories;
 using Westwind.AspNetCore.Markdown;
 using Markdig;
 using Microsoft.AspNetCore.Identity;
-using PTBlog.Endpoints;
+using PTBlog.Endpoints.V1;
 
 var builder = WebApplication.CreateBuilder(args);
 
