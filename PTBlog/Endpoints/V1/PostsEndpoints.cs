@@ -7,7 +7,7 @@ public static class PostsEndpointsExtensions
 {
     static public WebApplication MapPostsApiEndpoints(this WebApplication app)
     {
-        app.MapGet("/api/posts/", async (IPostsRepository repo) =>
+        app.MapGet(APIRoutes.Posts.GetAll, async (IPostsRepository repo) =>
         {
             var posts = await repo.GetPostsAsync();
             // TODO: Use another DTO (so we can return the post id etc)
