@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PTBlog.Data.Repositories;
 using PTBlog.Endpoints.V1.Requests;
+using PTBlog.Endpoints.V1.Responses;
 using PTBlog.Models;
 
 namespace PTBlog.Endpoints.V1;
@@ -10,9 +11,8 @@ public static class PostsEndpoints
     static public async Task<IResult> GetAll(IPostsRepository repo)
     {
         var posts = await repo.GetPostsAsync();
-        // TODO: Use another DTO (so we can return the post id etc)
-        var postDtos = posts.Select(x => new PostDTO(x.Title, x.Content));
-        return Results.Ok(postDtos);
+        var postResponses = posts.Select(x => new PostResponse(x.Id, x.Title, x.Content));
+        return Results.Ok(postResponses);
     }
 
     static public async Task<IResult> Get(IPostsRepository repo, int postId)
@@ -23,8 +23,8 @@ public static class PostsEndpoints
             return Results.NotFound();
         }
 
-        var postDto = new PostDTO(post.Title, post.Content);
-        return Results.Ok(postDto);
+        var postResponse = new PostResponse(post.Id, post.Title, post.Content);
+        return Results.Ok(postResponse);
     }
 
     static public async Task<IResult> Create(IPostsRepository repo, IUsersRepository userRepo, HttpContext context, [FromBody]CreatePostRequest postRequest)
