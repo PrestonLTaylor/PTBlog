@@ -1,4 +1,6 @@
-﻿using PTBlog.Data.Repositories;
+﻿using Microsoft.AspNetCore.Mvc;
+using PTBlog.Data.Repositories;
+using PTBlog.Endpoints.V1.Requests;
 using PTBlog.Models;
 
 namespace PTBlog.Endpoints.V1;
@@ -24,6 +26,23 @@ public static class PostsEndpoints
         var postDto = new PostDTO(post.Title, post.Content);
         return Results.Ok(postDto);
     }
+
+    static public async Task<IResult> Create(IPostsRepository repo, IUsersRepository userRepo, HttpContext context, [FromBody]CreatePostRequest postRequest)
+    {
+        // TODO: GetUserByAPIKey instead of from using the claim
+        var author = await userRepo.GetUserByClaimAsync(context.User);
+        if (author is null)
+        {
+            return Results.Unauthorized();
+        }
+
+        var postDto = new PostDTO(postRequest.Title, postRequest.Content);
+        var postId = await repo.AddPostFromDTOAsync(postDto, author);
+
+        var baseUrl = $"{context.Request.Scheme}://{context.Request.Host.ToUriComponent()}";
+        var createdUrl = $"{baseUrl}/{APIRoutes.Posts.Get.Replace("{postId}", postId.ToString())}";
+        return Results.Created(createdUrl, postId);
+    }
 }
 
 public static class PostsEndpointsExtensions
@@ -33,6 +52,8 @@ public static class PostsEndpointsExtensions
         app.MapGet(APIRoutes.Posts.GetAll, PostsEndpoints.GetAll);
 
         app.MapGet(APIRoutes.Posts.Get, PostsEndpoints.Get);
+
+        app.MapPost(APIRoutes.Posts.Create, PostsEndpoints.Create);
 
         return app;
     }
