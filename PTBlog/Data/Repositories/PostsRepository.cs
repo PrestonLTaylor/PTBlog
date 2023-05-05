@@ -41,6 +41,14 @@ public sealed class PostsRepository : IPostsRepository
 		await _dbContext.SaveChangesAsync();
 	}
 
+	public async Task<int> AddPostFromDTOAsync(PostDTO postDto, UserModel author)
+	{
+        var model = new PostModel { Title = postDto.Title, Content = postDto.Content,
+			AuthorId = author.Id, CreatedDate = DateTimeOffset.UtcNow };
+        await AddPostAsync(model);
+		return model.Id;
+	}
+
 	public async Task UpdatePostAsync(PostModel updatedPost)
 	{
 		_dbContext.Posts.Update(updatedPost);
