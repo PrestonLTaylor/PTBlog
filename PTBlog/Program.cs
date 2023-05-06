@@ -1,3 +1,4 @@
+using Serilog;
 using PTBlog.Data;
 using PTBlog.Models;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +9,11 @@ using Microsoft.AspNetCore.Identity;
 using PTBlog.Endpoints.V1;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((context, config) =>
+{
+    config.ReadFrom.Configuration(builder.Configuration);
+});
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<DatabaseContext>(options =>
