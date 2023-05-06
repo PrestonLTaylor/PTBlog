@@ -99,12 +99,13 @@ internal class PostsControllerTest
 		const string authorId = "Fake ID"; 
 		UserModel fakeUser = new UserModel { Id = authorId, };
 		_userRepoMock.Setup(repo => repo.GetUserByClaimAsync(It.IsAny<ClaimsPrincipal>())).ReturnsAsync(fakeUser);
-		PostModel expectedPost = GeneratePostToCreate(fakeUser);
-		_postRepoMock.Setup(repo => repo.AddPostAsync(It.Is<PostModel>(post => post.Equals(expectedPost)))).Verifiable();
+		var fakePost = GeneratePostToCreate(fakeUser);
+		var expectedPost = new PostDTO(fakePost.Title, fakePost.Content);
+		_postRepoMock.Setup(repo => repo.AddPostFromDTOAsync(It.Is<PostDTO>(post => post.Equals(expectedPost)), fakeUser)).Verifiable();
 		PostsController controller = new(_postRepoMock.Object, _userRepoMock.Object);
 
 		// Act
-		await controller.Create(new PostDTO(expectedPost.Title, expectedPost.Content));
+		await controller.Create(expectedPost);
 
 		// Assert
 		_postRepoMock.VerifyAll();

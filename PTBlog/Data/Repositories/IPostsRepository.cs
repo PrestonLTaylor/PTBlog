@@ -10,6 +10,7 @@ public interface IPostsRepository
 	public Task<PostModel?> GetPostByIdAsync(int? postId);
 
 	public Task AddPostAsync(PostModel post);
+	public Task<int> AddPostFromDTOAsync(PostDTO postDto, UserModel author);
 
 	public Task UpdatePostAsync(PostModel post);
 

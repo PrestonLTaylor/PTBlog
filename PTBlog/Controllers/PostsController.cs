@@ -60,9 +60,9 @@ public sealed class PostsController : Controller
             return View(postDto);
         }
 
-        var post = await CreatePostFromDTOAsync(postDto);
-        await _postsRepository.AddPostAsync(post);
-        return RedirectToListing(post.Id);
+        var author = await _usersRepository.GetUserByClaimAsync(User);
+        var postId = await _postsRepository.AddPostFromDTOAsync(postDto, author!);
+        return RedirectToListing(postId);
     }
 
     [Route("{action}/{id}")]
@@ -102,7 +102,6 @@ public sealed class PostsController : Controller
 		}
 
         UpdatePostTitleAndContent(post, postDto);
-		AddUpdatedDateToPost(post);
         await _postsRepository.UpdatePostAsync(post);
         return RedirectToListing(id);
     }
@@ -141,32 +140,6 @@ public sealed class PostsController : Controller
         await _postsRepository.DeletePostAsync(post);
         return RedirectToListings();
 	}
-
-    private async Task<PostModel> CreatePostFromDTOAsync(PostDTO postDto)
-    {
-        var post = new PostModel { Title = postDto.Title, Content = postDto.Content };
-
-		await AddAuthorToPostAsync(post);
-		AddCurrentDateToPost(post);
-
-        return post;
-	}
-
-    private async Task AddAuthorToPostAsync(PostModel post)
-    {
-        var user = await _usersRepository.GetUserByClaimAsync(User);
-		post.AuthorId = user!.Id;
-    }
-
-    private void AddCurrentDateToPost(PostModel post)
-    {
-        post.CreatedDate = DateTimeOffset.UtcNow;
-    }
-
-    private void AddUpdatedDateToPost(PostModel post)
-    {
-        post.UpdatedDate = DateTimeOffset.UtcNow;
-    }
 
     private void UpdatePostTitleAndContent(PostModel post, PostDTO postDto)
     {

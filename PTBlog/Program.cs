@@ -5,6 +5,7 @@ using PTBlog.Data.Repositories;
 using Westwind.AspNetCore.Markdown;
 using Markdig;
 using Microsoft.AspNetCore.Identity;
+using PTBlog.Endpoints.V1;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,5 +55,7 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.MapRazorPages();
+
+app.MapPostsApiEndpoints();
 
 app.Run();
