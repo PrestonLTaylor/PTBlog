@@ -17,7 +17,7 @@ public sealed class PostsRepository : IPostsRepository
 
 	public async Task<PostModel?> GetLatestPostAsync()
 	{
-		return await GetPostsOrderedByCreationDate().FirstAsync();
+		return await GetPostsOrderedByCreationDate().FirstOrDefaultAsync();
 	}
 
 	public async Task<List<PostModel>> GetPostsByTitleAsync(string wantedTitle)
