@@ -43,6 +43,23 @@ public static class PostsEndpoints
         var createdUrl = $"{baseUrl}/{APIRoutes.Posts.Get.Replace("{postId}", postId.ToString())}";
         return Results.Created(createdUrl, postId);
     }
+
+    static public async Task<IResult> Delete(IPostsRepository repo, IUsersRepository userRepo, HttpContext context, int postId)
+    {
+        var post = await repo.GetPostByIdAsync(postId);
+        if (post is null)
+        {
+            return Results.NotFound();
+        }
+
+        if (!await userRepo.DoesClaimHaveAccessToPost(context.User, post))
+        {
+            return Results.Forbid();
+        }
+
+        await repo.DeletePostAsync(post);
+        return Results.NoContent();
+    }
 }
 
 public static class PostsEndpointsExtensions
@@ -54,6 +71,8 @@ public static class PostsEndpointsExtensions
         app.MapGet(APIRoutes.Posts.Get, PostsEndpoints.Get);
 
         app.MapPost(APIRoutes.Posts.Create, PostsEndpoints.Create);
+
+        app.MapDelete(APIRoutes.Posts.Delete, PostsEndpoints.Delete);
 
         return app;
     }
