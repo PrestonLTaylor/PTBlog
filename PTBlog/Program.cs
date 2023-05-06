@@ -15,7 +15,7 @@ builder.Host.UseSerilog((context, config) =>
     config.ReadFrom.Configuration(builder.Configuration);
 });
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+var connectionString = builder.Configuration.GetValue<string>("POSTGRESQLCONNSTR_DefaultConnection") ?? throw new InvalidOperationException("Connection string 'POSTGRESQLCONNSTR_DefaultConnection' not found.");
 builder.Services.AddDbContext<DatabaseContext>(options =>
 {
     options.UseNpgsql(connectionString);
