@@ -44,6 +44,25 @@ public static class PostsEndpoints
         return Results.Created(createdUrl, postId);
     }
 
+    static public async Task<IResult> Edit(IPostsRepository repo, IUsersRepository userRepo, HttpContext context, int postId, [FromBody]EditPostRequest postRequest)
+    {
+		var post = await repo.GetPostByIdAsync(postId);
+		if (post is null)
+		{
+			return Results.NotFound();
+		}
+
+		if (!await userRepo.DoesClaimHaveAccessToPost(context.User, post))
+		{
+			return Results.Forbid();
+		}
+
+        post.Title = postRequest.Title;
+        post.Content = postRequest.Content;
+        await repo.UpdatePostAsync(post);
+        return Results.NoContent();
+	}
+
     static public async Task<IResult> Delete(IPostsRepository repo, IUsersRepository userRepo, HttpContext context, int postId)
     {
         var post = await repo.GetPostByIdAsync(postId);
@@ -71,6 +90,8 @@ public static class PostsEndpointsExtensions
         app.MapGet(APIRoutes.Posts.Get, PostsEndpoints.Get);
 
         app.MapPost(APIRoutes.Posts.Create, PostsEndpoints.Create);
+
+        app.MapPut(APIRoutes.Posts.Edit, PostsEndpoints.Edit);
 
         app.MapDelete(APIRoutes.Posts.Delete, PostsEndpoints.Delete);
 
