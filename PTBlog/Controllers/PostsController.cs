@@ -102,7 +102,6 @@ public sealed class PostsController : Controller
 		}
 
         UpdatePostTitleAndContent(post, postDto);
-		AddUpdatedDateToPost(post);
         await _postsRepository.UpdatePostAsync(post);
         return RedirectToListing(id);
     }
@@ -141,11 +140,6 @@ public sealed class PostsController : Controller
         await _postsRepository.DeletePostAsync(post);
         return RedirectToListings();
 	}
-
-    private void AddUpdatedDateToPost(PostModel post)
-    {
-        post.UpdatedDate = DateTimeOffset.UtcNow;
-    }
 
     private void UpdatePostTitleAndContent(PostModel post, PostDTO postDto)
     {

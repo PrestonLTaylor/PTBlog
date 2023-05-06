@@ -51,6 +51,7 @@ public sealed class PostsRepository : IPostsRepository
 
 	public async Task UpdatePostAsync(PostModel updatedPost)
 	{
+		updatedPost.UpdatedDate = DateTimeOffset.UtcNow;
 		_dbContext.Posts.Update(updatedPost);
 		await _dbContext.SaveChangesAsync();
 	}
