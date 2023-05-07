@@ -1,4 +1,6 @@
 ﻿@model UserModel
+@using PTBlog.Data.Repositories;
+@inject IUsersRepository repo
 @{
 	ViewData["Title"] = $"{Model.Username}'s Profile";
 }
@@ -7,6 +9,7 @@
 	<h1>@Model.Username's Profile</h1>
 
 	<img class="profile-picture" src="@Model.ProfilePictureURL" alt="@Model.Username's Profile Picture" />
+	<p>@await repo.GetRoleNameForUserAsync(Model)</p>
 
 	@if (Model.Posts.Any())
 	{

@@ -51,6 +51,16 @@ public sealed class UsersRepository : IUsersRepository
 		return user?.Id == post.AuthorId;
 	}
 
+	public async Task<string> GetRoleNameForUserAsync(UserModel user)
+	{
+		if (await _userManager.IsInRoleAsync(user, IsAdminRole.Name))
+		{
+			return "Admin";
+		}
+
+		return "User";
+	}
+
 	private readonly DatabaseContext _dbContext;
 	private readonly UserManager<UserModel> _userManager;
 }

@@ -10,4 +10,6 @@ public interface IUsersRepository
 	public Task<UserModel?> GetUserByClaimAsync(ClaimsPrincipal claim);
 
 	public Task<bool> DoesClaimHaveAccessToPost(ClaimsPrincipal claim, PostModel post);
+
+	public Task<string> GetRoleNameForUserAsync(UserModel user);
 }

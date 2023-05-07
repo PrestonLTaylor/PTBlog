@@ -1,4 +1,6 @@
 ﻿@model IEnumerable<UserModel>
+@using PTBlog.Data.Repositories;
+@inject IUsersRepository repo;
 @{
 	ViewData["Title"] = "Users";
 }
@@ -9,8 +11,8 @@
 	<table class="table">
 		<thead>
 			<tr>
-				<th>@Html.DisplayNameFor(model => model.Id)</th>
 				<th>@Html.DisplayNameFor(model => model.Username)</th>
+				<th>Role</th>
 				<th>@Html.DisplayNameFor(model => model.ProfilePictureURL)</th>
 			</tr>
 		</thead>
@@ -20,10 +22,10 @@
 			{
 				<tr>
 					<td class="align-middle">
-						@Html.DisplayFor(model => user.Id)
+						<a asp-area="" asp-controller="Users" asp-action="Profile" asp-route-id="@user.Id">@Html.DisplayFor(model => user.Username)</a>
 					</td>
 					<td class="align-middle">
-						<a asp-area="" asp-controller="Users" asp-action="Profile" asp-route-id="@user.Id">@Html.DisplayFor(model => user.Username)</a>
+						<p class="no-margin">@await repo.GetRoleNameForUserAsync(user)</p>
 					</td>
 					<td class="align-middle">
 						<img class="profile-picture" src="@user.ProfilePictureURL" alt="@user.Username's Profile Picutre">
