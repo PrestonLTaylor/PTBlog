@@ -21,6 +21,10 @@ body {
   margin-bottom: 60px;
 }
 
+.no-margin {
+    margin: 0;
+}
+
 .profile-picture {
     max-width: 64px;
     max-height: 64px;
