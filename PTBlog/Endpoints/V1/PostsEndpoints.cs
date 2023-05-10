@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Mvc;
 using PTBlog.Data.Repositories;
 using PTBlog.Endpoints.V1.Requests;
 using PTBlog.Endpoints.V1.Responses;
@@ -27,10 +28,9 @@ public static class PostsEndpoints
         return Results.Ok(postResponse);
     }
 
-    static public async Task<IResult> Create(IPostsRepository repo, IUsersRepository userRepo, HttpContext context, [FromBody]CreatePostRequest postRequest)
+    static public async Task<IResult> Create(IPostsRepository repo, IUsersRepository userRepo, HttpRequest request, [FromBody]CreatePostRequest postRequest)
     {
-        // TODO: GetUserByAPIKey instead of from using the claim
-        var author = await userRepo.GetUserByClaimAsync(context.User);
+        var author = await userRepo.GetUserFromRequestAsync(request);
         if (author is null)
         {
             return Results.Unauthorized();
@@ -39,12 +39,12 @@ public static class PostsEndpoints
         var postDto = new PostDTO(postRequest.Title, postRequest.Content);
         var postId = await repo.AddPostFromDTOAsync(postDto, author);
 
-        var baseUrl = $"{context.Request.Scheme}://{context.Request.Host.ToUriComponent()}";
+        var baseUrl = $"{request.Scheme}://{request.Host.ToUriComponent()}";
         var createdUrl = $"{baseUrl}/{APIRoutes.Posts.Get.Replace("{postId}", postId.ToString())}";
         return Results.Created(createdUrl, postId);
     }
 
-    static public async Task<IResult> Edit(IPostsRepository repo, IUsersRepository userRepo, HttpContext context, int postId, [FromBody]EditPostRequest postRequest)
+    static public async Task<IResult> Edit(IPostsRepository repo, IUsersRepository userRepo, HttpRequest request, int postId, [FromBody]EditPostRequest postRequest)
     {
 		var post = await repo.GetPostByIdAsync(postId);
 		if (post is null)
@@ -52,12 +52,11 @@ public static class PostsEndpoints
 			return Results.NotFound();
 		}
 
-        var user = await userRepo.GetUserByClaimAsync(context.User);
+        var user = await userRepo.GetUserFromRequestAsync(request);
         if (user is null)
         {
             return Results.Unauthorized();
         }
-
 		if (!await userRepo.DoesUserHaveAccessToPost(user, post))
 		{
 			return Results.Forbid();
@@ -69,7 +68,7 @@ public static class PostsEndpoints
         return Results.NoContent();
 	}
 
-    static public async Task<IResult> Delete(IPostsRepository repo, IUsersRepository userRepo, HttpContext context, int postId)
+    static public async Task<IResult> Delete(IPostsRepository repo, IUsersRepository userRepo, HttpRequest request, int postId)
     {
         var post = await repo.GetPostByIdAsync(postId);
         if (post is null)
@@ -77,12 +76,11 @@ public static class PostsEndpoints
             return Results.NotFound();
         }
 
-		var user = await userRepo.GetUserByClaimAsync(context.User);
+		var user = await userRepo.GetUserFromRequestAsync(request);
 		if (user is null)
 		{
 			return Results.Unauthorized();
 		}
-
 		if (!await userRepo.DoesUserHaveAccessToPost(user, post))
 		{
 			return Results.Forbid();
