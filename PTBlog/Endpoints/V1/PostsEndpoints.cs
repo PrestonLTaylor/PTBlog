@@ -59,7 +59,7 @@ public static class PostsEndpoints
         }
 		if (!await userRepo.DoesUserHaveAccessToPost(user, post))
 		{
-			return Results.Forbid();
+			return Results.StatusCode(StatusCodes.Status403Forbidden);
 		}
 
         post.Title = postRequest.Title;
@@ -83,7 +83,7 @@ public static class PostsEndpoints
 		}
 		if (!await userRepo.DoesUserHaveAccessToPost(user, post))
 		{
-			return Results.Forbid();
+			return Results.StatusCode(StatusCodes.Status403Forbidden);
 		}
 
 		await repo.DeletePostAsync(post);
