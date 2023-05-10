@@ -30,6 +30,17 @@ public sealed class UsersRepository : IUsersRepository
 		return await GetUsersWithTheirRelations().FirstOrDefaultAsync(u => u.Id.Equals(id));
 	}
 
+	public async Task<UserModel?> GetUserFromRequestAsync(HttpRequest request)
+	{
+		var apiKey = GetApiKeyFromRequest(request);
+		return await GetUsersWithTheirRelations().FirstOrDefaultAsync(u => u.ApiKey != null && u.ApiKey.Equals(apiKey));
+	}
+
+	private string GetApiKeyFromRequest(HttpRequest request)
+	{
+		return request.Headers["API_KEY"].ToString();
+	}
+
 	public async Task<UserModel?> GetUserByClaimAsync(ClaimsPrincipal claim)
 	{
 		return await _userManager.GetUserAsync(claim);
