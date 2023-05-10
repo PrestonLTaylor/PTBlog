@@ -16,4 +16,6 @@ public sealed class UserModel : IdentityUser
         get => UserName;
         set => UserName = value;
     }
+
+    public string? ApiKey { get; set; }
 }
