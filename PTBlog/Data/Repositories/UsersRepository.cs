@@ -71,6 +71,14 @@ public sealed class UsersRepository : IUsersRepository
 		return "User";
 	}
 
+	public async Task<string> GenerateNewApiKeyForUserAsync(UserModel user)
+	{
+		user.ApiKey = Guid.NewGuid().ToString();
+		_dbContext.Users.Update(user);
+		await _dbContext.SaveChangesAsync();
+		return user.ApiKey;
+	}
+
 	private readonly DatabaseContext _dbContext;
 	private readonly UserManager<UserModel> _userManager;
 }

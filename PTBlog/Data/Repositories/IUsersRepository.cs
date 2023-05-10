@@ -13,4 +13,6 @@ public interface IUsersRepository
 	public Task<bool> DoesUserHaveAccessToPost(UserModel user, PostModel post);
 
 	public Task<string> GetRoleNameForUserAsync(UserModel user);
+
+	public Task<string> GenerateNewApiKeyForUserAsync(UserModel user);
 }
