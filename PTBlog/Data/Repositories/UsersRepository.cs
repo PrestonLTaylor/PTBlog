@@ -51,14 +51,13 @@ public sealed class UsersRepository : IUsersRepository
 		return _dbContext.Users.Include(u => u.Posts);
 	}
 
-	public async Task<bool> DoesClaimHaveAccessToPost(ClaimsPrincipal claim, PostModel post)
+	public async Task<bool> DoesUserHaveAccessToPost(UserModel user, PostModel post)
 	{
-		if (IsAdminRole.IsUserAnAdmin(claim))
+		if (await _userManager.IsInRoleAsync(user, IsAdminRole.Name))
 		{
 			return true;
 		}
 
-		var user = await GetUserByClaimAsync(claim);
 		return user?.Id == post.AuthorId;
 	}
 

@@ -149,7 +149,13 @@ public sealed class PostsController : Controller
 
 	private async Task<bool> DoesUserHaveAccessToPost(PostModel post)
     {
-        return await _usersRepository.DoesClaimHaveAccessToPost(User, post);
+        var user = await _usersRepository.GetUserByClaimAsync(User);
+        if (user is null)
+        {
+            return false;
+        }
+
+        return await _usersRepository.DoesUserHaveAccessToPost(user, post);
 	}
 
     private IActionResult RedirectToListings()

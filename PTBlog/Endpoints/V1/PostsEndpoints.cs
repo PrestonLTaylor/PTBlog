@@ -52,7 +52,13 @@ public static class PostsEndpoints
 			return Results.NotFound();
 		}
 
-		if (!await userRepo.DoesClaimHaveAccessToPost(context.User, post))
+        var user = await userRepo.GetUserByClaimAsync(context.User);
+        if (user is null)
+        {
+            return Results.Unauthorized();
+        }
+
+		if (!await userRepo.DoesUserHaveAccessToPost(user, post))
 		{
 			return Results.Forbid();
 		}
@@ -71,12 +77,18 @@ public static class PostsEndpoints
             return Results.NotFound();
         }
 
-        if (!await userRepo.DoesClaimHaveAccessToPost(context.User, post))
-        {
-            return Results.Forbid();
-        }
+		var user = await userRepo.GetUserByClaimAsync(context.User);
+		if (user is null)
+		{
+			return Results.Unauthorized();
+		}
 
-        await repo.DeletePostAsync(post);
+		if (!await userRepo.DoesUserHaveAccessToPost(user, post))
+		{
+			return Results.Forbid();
+		}
+
+		await repo.DeletePostAsync(post);
         return Results.NoContent();
     }
 }

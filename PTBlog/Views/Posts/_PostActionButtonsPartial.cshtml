@@ -1,8 +1,15 @@
 ﻿@model PostModel
 @using PTBlog.Data.Repositories
 @inject IUsersRepository usersRepo
+@{
+	var user = await usersRepo.GetUserByClaimAsync(User);
+	if (user is null)
+	{
+		return;
+	}
+}
 
-@if (await usersRepo.DoesClaimHaveAccessToPost(User, Model))
+@if (await usersRepo.DoesUserHaveAccessToPost(user, Model))
 {
 	<h2>Actions:</h2>
 	<a class="btn btn-outline-info" asp-controller="Posts" asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
