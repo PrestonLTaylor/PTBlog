@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33403.182
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PTBlog", "PTBlog\PTBlog.csproj", "{F6B64ABD-3862-4F9D-AC8B-B3FA44FC92A4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PTBlog", "PTBlog\PTBlog.csproj", "{F6B64ABD-3862-4F9D-AC8B-B3FA44FC92A4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PTBlogTests.Unit", "PTBlogTests.Unit\PTBlogTests.Unit.csproj", "{31D43F24-34C7-4983-8029-543FF0BC75FC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PTBlogTests.Unit", "PTBlogTests.Unit\PTBlogTests.Unit.csproj", "{31D43F24-34C7-4983-8029-543FF0BC75FC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

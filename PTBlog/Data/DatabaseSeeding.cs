@@ -56,7 +56,8 @@ public static class DevelopmentDbInitializerExtensions
             Id = userId,
             ProfilePictureURL = "https://www.pngfind.com/pngs/m/676-6764065_default-profile-picture-transparent-hd-png-download.png",
             Username = username,
-        };
+            ApiKey = userId, // This is not how the actual api key will work, but for testing it's very convenient
+		};
 
         const string password = "TestPassword1!";
         await userManager.CreateAsync(user, password);

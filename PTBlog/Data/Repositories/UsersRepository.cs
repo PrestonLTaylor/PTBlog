@@ -30,6 +30,17 @@ public sealed class UsersRepository : IUsersRepository
 		return await GetUsersWithTheirRelations().FirstOrDefaultAsync(u => u.Id.Equals(id));
 	}
 
+	public async Task<UserModel?> GetUserFromRequestAsync(HttpRequest request)
+	{
+		var apiKey = GetApiKeyFromRequest(request);
+		return await GetUsersWithTheirRelations().FirstOrDefaultAsync(u => u.ApiKey != null && u.ApiKey.Equals(apiKey));
+	}
+
+	private string GetApiKeyFromRequest(HttpRequest request)
+	{
+		return request.Headers["API_KEY"].ToString();
+	}
+
 	public async Task<UserModel?> GetUserByClaimAsync(ClaimsPrincipal claim)
 	{
 		return await _userManager.GetUserAsync(claim);
@@ -40,14 +51,13 @@ public sealed class UsersRepository : IUsersRepository
 		return _dbContext.Users.Include(u => u.Posts);
 	}
 
-	public async Task<bool> DoesClaimHaveAccessToPost(ClaimsPrincipal claim, PostModel post)
+	public async Task<bool> DoesUserHaveAccessToPost(UserModel user, PostModel post)
 	{
-		if (IsAdminRole.IsUserAnAdmin(claim))
+		if (await _userManager.IsInRoleAsync(user, IsAdminRole.Name))
 		{
 			return true;
 		}
 
-		var user = await GetUserByClaimAsync(claim);
 		return user?.Id == post.AuthorId;
 	}
 
@@ -59,6 +69,14 @@ public sealed class UsersRepository : IUsersRepository
 		}
 
 		return "User";
+	}
+
+	public async Task<string> GenerateNewApiKeyForUserAsync(UserModel user)
+	{
+		user.ApiKey = Guid.NewGuid().ToString();
+		_dbContext.Users.Update(user);
+		await _dbContext.SaveChangesAsync();
+		return user.ApiKey;
 	}
 
 	private readonly DatabaseContext _dbContext;
