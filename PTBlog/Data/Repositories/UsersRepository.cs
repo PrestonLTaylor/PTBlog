@@ -73,12 +73,23 @@ public sealed class UsersRepository : IUsersRepository
 
 	public async Task<string> GenerateNewApiKeyForUserAsync(UserModel user)
 	{
-		user.ApiKey = Guid.NewGuid().ToString();
-		_dbContext.Users.Update(user);
-		await _dbContext.SaveChangesAsync();
-		return user.ApiKey;
+		var apiKey = Guid.NewGuid().ToString();
+		await ChangeApiKeyForUserAsync(user, apiKey);
+		return apiKey;
 	}
 
-	private readonly DatabaseContext _dbContext;
+	public async Task RevokeApiKeyForUserAsync(UserModel user)
+	{
+		await ChangeApiKeyForUserAsync(user, null);
+    }
+
+	private async Task ChangeApiKeyForUserAsync(UserModel user, string? newApiKey)
+	{
+        user.ApiKey = newApiKey;
+        _dbContext.Users.Update(user);
+        await _dbContext.SaveChangesAsync();
+    }
+
+    private readonly DatabaseContext _dbContext;
 	private readonly UserManager<UserModel> _userManager;
 }
