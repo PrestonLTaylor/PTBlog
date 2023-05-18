@@ -11,22 +11,37 @@ namespace PTBlogTests.Unit;
 internal class PostsControllerTest
 {
 	[Test]
-	public async Task Listings_ReturnsEveryPostInTheRepository()
+	public async Task Listings_ReturnsEveryPostOnAValidPage()
 	{
 		// Arrange
-		var fakePosts = GenerateFakePosts();
-		_postRepoMock.Setup(repo => repo.GetPostsAsync()).ReturnsAsync(fakePosts);
+		const int page = 1;
+		var fakePosts = GenerateFakePosts().Take(5).ToList();
+		_postRepoMock.Setup(repo => repo.GetPostsOnPageAsync(page)).ReturnsAsync(fakePosts);
 		PostsController controller = new(_postRepoMock.Object, _userRepoMock.Object);
 
 		// Act
-		var result = await controller.Listings() as ViewResult;
+		var result = await controller.Listings(page) as ViewResult;
 		var modelPosts = result?.ViewData.Model as List<PostModel>;
 
 		// Assert
-		Assert.That(modelPosts, Has.Count.EqualTo(fakePosts.Count));
+		Assert.That(modelPosts, Has.Count.EqualTo(5));
 	}
 
-	[Test]
+    [Test]
+    public async Task Listings_ReturnsBadRequest_WhenSuppliedInvalidPage()
+    {
+        // Arrange
+        const int page = -1;
+        PostsController controller = new(_postRepoMock.Object, _userRepoMock.Object);
+
+        // Act
+        var result = await controller.Listings(page) as BadRequestResult;
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+    }
+
+    [Test]
 	public async Task Listing_ReturnsSpecifiedPost_WhenSuppliedId()
 	{
 		// Arrange

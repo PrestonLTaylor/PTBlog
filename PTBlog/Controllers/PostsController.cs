@@ -17,10 +17,15 @@ public sealed class PostsController : Controller
     }
 
     [Route("")]
-    [Route("{action}")]
-    public async Task<IActionResult> Listings()
+    [Route("{action}/{page}")]
+    public async Task<IActionResult> Listings(int page = 1)
     {
-        var posts = await _postsRepository.GetPostsAsync();
+        if (page < 1)
+        {
+            return BadRequest();
+        }
+
+        var posts = await _postsRepository.GetPostsOnPageAsync(page);
         return View(posts);
     }
 
