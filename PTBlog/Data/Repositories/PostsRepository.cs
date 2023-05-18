@@ -15,6 +15,12 @@ public sealed class PostsRepository : IPostsRepository
 		return await GetPostsOrderedByCreationDate().ToListAsync();
 	}
 
+	public async Task<List<PostModel>> GetPostsOnPageAsync(int pageNumber)
+	{
+		var postsToSkip = (pageNumber - 1) * POSTS_PER_PAGE;
+		return await GetPostsOrderedByCreationDate().Skip(postsToSkip).Take(POSTS_PER_PAGE).ToListAsync();
+	}
+
 	public async Task<PostModel?> GetLatestPostAsync()
 	{
 		return await GetPostsOrderedByCreationDate().FirstOrDefaultAsync();
@@ -73,4 +79,5 @@ public sealed class PostsRepository : IPostsRepository
 	}
 
 	private readonly DatabaseContext _dbContext;
+	private const int POSTS_PER_PAGE = 5;
 }
