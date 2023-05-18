@@ -1,4 +1,5 @@
 ﻿using Azure.Core;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using PTBlog.Data.Repositories;
 using PTBlog.Endpoints.V1.Requests;
@@ -9,10 +10,20 @@ namespace PTBlog.Endpoints.V1;
 
 public static class PostsEndpoints
 {
-    static public async Task<IResult> GetAll(IPostsRepository repo)
+    static public async Task<IResult> GetAllOnPage(IPostsRepository repo, [FromBody]PaginationRequest paginationRequest)
     {
-        var posts = await repo.GetPostsAsync();
-        var postResponses = posts.Select(x => new PostResponse(x.Id, x.Title, x.Content));
+        if (paginationRequest.Page < 1)
+        {
+            return Results.BadRequest();
+        }
+
+        var posts = await repo.GetPostsOnPageAsync(paginationRequest.Page);
+		if (posts.Count == 0)
+		{
+			return Results.NotFound();
+		}
+
+		var postResponses = posts.Select(x => new PostResponse(x.Id, x.Title, x.Content));
         return Results.Ok(postResponses);
     }
 
@@ -95,7 +106,7 @@ public static class PostsEndpointsExtensions
 {
     static public WebApplication MapPostsApiEndpoints(this WebApplication app)
     {
-        app.MapGet(APIRoutes.Posts.GetAll, PostsEndpoints.GetAll);
+        app.MapGet(APIRoutes.Posts.GetAll, PostsEndpoints.GetAllOnPage);
 
         app.MapGet(APIRoutes.Posts.Get, PostsEndpoints.Get);
 
