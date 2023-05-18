@@ -68,6 +68,16 @@ public sealed class PostsRepository : IPostsRepository
 		await _dbContext.SaveChangesAsync();
 	}
 
+	public bool IsOnFirstPage(int page)
+	{
+		return page == 1;
+	}
+
+	public bool IsOnLastPage(int page)
+	{
+		return page == Math.Ceiling(_dbContext.Posts.Count() / 5.0);
+	}
+
 	private IQueryable<PostModel> GetPostsWithTheirRelations()
 	{
 		return _dbContext.Posts.Include(p => p.Author);

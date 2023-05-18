@@ -16,4 +16,7 @@ public interface IPostsRepository
 	public Task UpdatePostAsync(PostModel post);
 
 	public Task DeletePostAsync(PostModel post);
+
+	public bool IsOnFirstPage(int page);
+	public bool IsOnLastPage(int page);
 }
