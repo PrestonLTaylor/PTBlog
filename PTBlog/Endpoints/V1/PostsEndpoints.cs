@@ -41,6 +41,11 @@ public static class PostsEndpoints
 
     static public async Task<IResult> Create(IPostsRepository repo, IUsersRepository userRepo, HttpRequest request, [FromBody]CreatePostRequest postRequest)
     {
+        if (string.IsNullOrEmpty(postRequest.Title) || string.IsNullOrEmpty(postRequest.Content))
+        {
+            return Results.BadRequest();
+        }
+
         var author = await userRepo.GetUserFromRequestAsync(request);
         if (author is null)
         {
@@ -57,6 +62,11 @@ public static class PostsEndpoints
 
     static public async Task<IResult> Edit(IPostsRepository repo, IUsersRepository userRepo, HttpRequest request, int postId, [FromBody]EditPostRequest postRequest)
     {
+		if (string.IsNullOrEmpty(postRequest.Title) || string.IsNullOrEmpty(postRequest.Content))
+		{
+			return Results.BadRequest();
+		}
+
 		var post = await repo.GetPostByIdAsync(postId);
 		if (post is null)
 		{
