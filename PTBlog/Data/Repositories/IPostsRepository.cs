@@ -5,6 +5,7 @@ namespace PTBlog.Data.Repositories;
 public interface IPostsRepository
 {
 	public Task<List<PostModel>> GetPostsAsync();
+	public Task<List<PostModel>> GetPostsOnPageAsync(int page);
 	public Task<PostModel?> GetLatestPostAsync();
     public Task<List<PostModel>> GetPostsByTitleAsync(string titleWanted);
 	public Task<PostModel?> GetPostByIdAsync(int? postId);
@@ -15,4 +16,7 @@ public interface IPostsRepository
 	public Task UpdatePostAsync(PostModel post);
 
 	public Task DeletePostAsync(PostModel post);
+
+	public bool IsOnFirstPage(int page);
+	public bool IsOnLastPage(int page);
 }

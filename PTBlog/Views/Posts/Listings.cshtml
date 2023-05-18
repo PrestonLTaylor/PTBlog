@@ -1,9 +1,13 @@
 ﻿@model IEnumerable<PostModel>
 @{
-	ViewData["Title"] = "Listings";
+	var pageAsString = ViewContext.RouteData.Values["page"] as string ?? "1";
+	var currentPage = int.Parse(pageAsString);
+	ViewData["Title"] = $"Listings - Page {currentPage}";
 }
 
-<h1>Posts</h1>
+<h1>Posts - Page @currentPage</h1>
+
+@await Html.PartialAsync("~/Views/Posts/_PageButtonsPartial.cshtml", currentPage)
 
 <div class="row">
 	@await Html.PartialAsync("~/Views/Posts/_PostsCardPartial.cshtml")

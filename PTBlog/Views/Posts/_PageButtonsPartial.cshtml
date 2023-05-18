@@ -1,0 +1,23 @@
+﻿@model int
+@using PTBlog.Data.Repositories
+@inject IPostsRepository repo 
+@{
+	var isOnFirstPage = repo.IsOnFirstPage(Model);
+	var isOnLastPage = repo.IsOnLastPage(Model);
+}
+
+<div class="d-flex justify-content-between">
+	@if (isOnFirstPage) // We have an empty div so that the flexbox puts the next page button on the right
+	{
+		<div></div>	
+	}
+	else
+	{
+		<a class="link-primary m-1" asp-action="Listings" asp-route-page="@(Model - 1)">&lt;-- Prev Page</a>
+	}
+
+	@if (!isOnLastPage)
+	{
+		<a class="link-primary m-1" asp-action="Listings" asp-route-page="@(Model + 1)">Next Page --&gt;</a>
+	}
+</div>
