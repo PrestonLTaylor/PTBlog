@@ -1,10 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
+﻿using Bogus;
+using Microsoft.AspNetCore.Identity;
 using PTBlog.Claims;
 using PTBlog.Models;
-using System.Security.Claims;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace PTBlog.Data;
 
@@ -36,50 +33,72 @@ public static class DevelopmentDbInitializerExtensions
 		await dbContext.Database.EnsureCreatedAsync();
 
 		await AddAdminRoleAsync(scope, dbContext);
+		await CreateOwnerAsync(userManager);
 
-		if (!dbContext.Users.Any())
-		{
-			await CreateDefaultUserWithNameAsync(userManager, "Owner", isAdmin: true);
-			var blogger1Id = await CreateDefaultUserWithNameAsync(userManager, "Blogger1", isAdmin: false);
-			var blogger2Id = await CreateDefaultUserWithNameAsync(userManager, "Blogger2", isAdmin: false);
-
-			CreateDefaultPostWithAuthor(dbContext, blogger1Id);
-			CreateDefaultPostWithAuthor(dbContext, blogger2Id);
+		const string password = "TestPassword1!";
+        var postFaker = CreatePostFaker();
+        var userFaker = CreateUserFaker(dbContext, postFaker);
+        var users = userFaker.Generate(100);
+        foreach (var user in users)
+        {
+			await userManager.CreateAsync(user, password);
 		}
 	}
 
-    static private async Task<string> CreateDefaultUserWithNameAsync(UserManager<UserModel> userManager, string username, bool isAdmin)
+    static private Faker<UserModel> CreateUserFaker(DatabaseContext dbContext, Faker<PostModel> postFaker)
+    {
+        return new Faker<UserModel>()
+            .RuleFor(u => u.Id, _ => Guid.NewGuid().ToString())
+            .RuleFor(u => u.ProfilePictureURL, f => f.Internet.Avatar())
+            .RuleFor(u => u.UserName, f => f.Internet.UserName())
+            .RuleFor(u => u.ApiKey, (_, u) => u.Id)
+            .RuleFor(u => u.Posts, (f, u) =>
+            {
+                postFaker.RuleFor(p => p.AuthorId, _ => u.Id);
+
+                var posts = postFaker.GenerateBetween(1, 5);
+
+                return posts;
+            });
+    }
+
+	static private Faker<PostModel> CreatePostFaker()
+	{
+        int _bogusPostId = 1;
+        return new Faker<PostModel>()
+            .RuleFor(p => p.Id, _ => _bogusPostId++)
+            .RuleFor(p => p.Title, f => f.Hacker.Phrase())
+            .RuleFor(p => p.Content, f => f.Lorem.Sentences(4))
+            .RuleFor(p => p.CreatedDate, f => f.Date.Recent(10))
+            .RuleFor(p => p.UpdatedDate, f => f.Date.Recent(10))
+            .FinishWith((f, p) =>
+            {
+                // Make sure updated date is after created date!
+                if (p.CreatedDate > p.UpdatedDate)
+                {
+                    (p.CreatedDate, p.UpdatedDate) = (p.UpdatedDate!.Value, p.CreatedDate);
+                }
+
+                // postgreSQL doesn't support offsets in dates so we remove them
+                p.CreatedDate = p.CreatedDate.UtcDateTime;
+                p.UpdatedDate = p.UpdatedDate!.Value.UtcDateTime;
+            });
+	}
+
+	static private async Task CreateOwnerAsync(UserManager<UserModel> userManager)
     {
         var userId = Guid.NewGuid().ToString();
         var user = new UserModel()
         {
             Id = userId,
             ProfilePictureURL = "https://www.pngfind.com/pngs/m/676-6764065_default-profile-picture-transparent-hd-png-download.png",
-            Username = username,
-            ApiKey = userId, // This is not how the actual api key will work, but for testing it's very convenient
-		};
+            Username = "Owner",
+            ApiKey = userId,	
+        };
 
         const string password = "TestPassword1!";
         await userManager.CreateAsync(user, password);
-
-        if (isAdmin)
-        {
-            await userManager.AddToRoleAsync(user, IsAdminRole.Name);
-        }
-
-        return userId;
-    }
-
-    static private void CreateDefaultPostWithAuthor(DatabaseContext context, string authorId)
-    {
-        context.Posts.Add(new PostModel()
-        {
-            AuthorId = authorId,
-            Title = "Default Post",
-            Content = $"This is a development blog for Author {authorId}!",
-            CreatedDate = DateTimeOffset.UtcNow.AddDays(-1),
-            UpdatedDate = DateTimeOffset.UtcNow,
-        });
+        await userManager.AddToRoleAsync(user, IsAdminRole.Name);
     }
 
     static private async Task AddAdminRoleAsync(IServiceScope scope, DatabaseContext context)
