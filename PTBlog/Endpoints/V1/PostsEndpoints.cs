@@ -10,7 +10,13 @@ namespace PTBlog.Endpoints.V1;
 
 public static class PostsEndpoints
 {
-    static public async Task<IResult> GetAllOnPage(IPostsRepository repo, [FromQuery]int page)
+	/// <summary>
+	/// Gets every post on the supplied page
+	/// </summary>
+	/// <response code="200">Returns every post on the supplied page</response>
+	/// <response code="400">An invalid page number was supplied</response>
+	/// <response code="404">A page does not exist for the supplied page number</response>
+	static public async Task<IResult> GetAllOnPage(IPostsRepository repo, [FromQuery]int page)
     {
         if (page < 1)
         {
@@ -27,7 +33,12 @@ public static class PostsEndpoints
         return Results.Ok(postResponses);
     }
 
-    static public async Task<IResult> Get(IPostsRepository repo, int postId)
+	/// <summary>
+	/// Gets a post by its post id
+	/// </summary>
+	/// <response code="200">Returns a post by its post id</response>
+	/// <response code="404">A post does not exist with the supplied id</response>
+	static public async Task<IResult> Get(IPostsRepository repo, int postId)
     {
         var post = await repo.GetPostByIdAsync(postId);
         if (post is null)
@@ -39,7 +50,13 @@ public static class PostsEndpoints
         return Results.Ok(postResponse);
     }
 
-    static public async Task<IResult> Create(IPostsRepository repo, IUsersRepository userRepo, HttpRequest request, [FromBody]CreatePostRequest postRequest)
+	/// <summary>
+	/// Creates a post with the author of the API key
+	/// </summary>
+	/// <response code="201">The post was created successfully</response>
+	/// <response code="400">An empty post title or content was supplied</response>
+	/// <response code="401">A valid API key for a user was not supplied</response>
+	static public async Task<IResult> Create(IPostsRepository repo, IUsersRepository userRepo, HttpRequest request, [FromBody]CreatePostRequest postRequest)
     {
         if (string.IsNullOrEmpty(postRequest.Title) || string.IsNullOrEmpty(postRequest.Content))
         {
@@ -60,7 +77,15 @@ public static class PostsEndpoints
         return Results.Created(createdUrl, postId);
     }
 
-    static public async Task<IResult> Edit(IPostsRepository repo, IUsersRepository userRepo, HttpRequest request, int postId, [FromBody]EditPostRequest postRequest)
+	/// <summary>
+	/// Edits a post by its post id
+	/// </summary>
+	/// <response code="204">The post was edited successfully</response>
+	/// <response code="400">An empty post title or content was supplied</response>
+	/// <response code="401">A valid API key for a user was not supplied</response>
+	/// <response code="403">The user does not have access to edit the post</response>
+	/// <response code="404">A post does not exist with the supplied id</response>
+	static public async Task<IResult> Edit(IPostsRepository repo, IUsersRepository userRepo, HttpRequest request, int postId, [FromBody]EditPostRequest postRequest)
     {
 		if (string.IsNullOrEmpty(postRequest.Title) || string.IsNullOrEmpty(postRequest.Content))
 		{
@@ -89,7 +114,14 @@ public static class PostsEndpoints
         return Results.NoContent();
 	}
 
-    static public async Task<IResult> Delete(IPostsRepository repo, IUsersRepository userRepo, HttpRequest request, int postId)
+	/// <summary>
+	/// Deletes a post by its post id 
+	/// </summary>
+	/// <response code="204">The post was deleted successfully</response>
+	/// <response code="401">A valid API key for a user was not supplied</response>
+	/// <response code="403">The user does not have access to delete the post</response>
+	/// <response code="403">A post does not exist with the supplied id</response>
+	static public async Task<IResult> Delete(IPostsRepository repo, IUsersRepository userRepo, HttpRequest request, int postId)
     {
         var post = await repo.GetPostByIdAsync(postId);
         if (post is null)

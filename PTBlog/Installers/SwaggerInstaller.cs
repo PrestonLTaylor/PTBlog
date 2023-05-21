@@ -2,6 +2,7 @@
 using PTBlog.Configuration;
 using PTBlog.Endpoints.V1;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Reflection;
 
 namespace PTBlog.Installers;
 
@@ -38,6 +39,10 @@ public static class SwaggerInstaller
 				Id = apiKeyId,
 			}
 		}, new List<string>() } });
+
+		// Gets annotations from XML comments
+		var xmlCommentsPath = $"{AppContext.BaseDirectory}/{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+		options.IncludeXmlComments(xmlCommentsPath);
 	}
 
 	static public WebApplication UseSwaggerAndUI(this WebApplication app)
