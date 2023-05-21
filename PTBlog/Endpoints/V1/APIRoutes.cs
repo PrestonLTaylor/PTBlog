@@ -8,7 +8,7 @@ public static class APIRoutes
 
     public static class Posts
     {
-        public const string GetAll = $"{Base}/posts";
+        public const string GetAllOnPage = $"{Base}/posts";
         public const string Get = $"{Base}/posts/{{postId}}";
         public const string Create = $"{Base}/posts";
         public const string Edit = $"{Base}/posts/{{postId}}";

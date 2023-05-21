@@ -10,14 +10,14 @@ namespace PTBlog.Endpoints.V1;
 
 public static class PostsEndpoints
 {
-    static public async Task<IResult> GetAllOnPage(IPostsRepository repo, [FromBody]PaginationRequest paginationRequest)
+    static public async Task<IResult> GetAllOnPage(IPostsRepository repo, [FromQuery]int page)
     {
-        if (paginationRequest.Page < 1)
+        if (page < 1)
         {
             return Results.BadRequest();
         }
 
-        var posts = await repo.GetPostsOnPageAsync(paginationRequest.Page);
+        var posts = await repo.GetPostsOnPageAsync(page);
 		if (posts.Count == 0)
 		{
 			return Results.NotFound();
@@ -116,7 +116,7 @@ public static class PostsEndpointsExtensions
 {
     static public WebApplication MapPostsApiEndpoints(this WebApplication app)
     {
-        app.MapGet(APIRoutes.Posts.GetAll, PostsEndpoints.GetAllOnPage);
+        app.MapGet(APIRoutes.Posts.GetAllOnPage, PostsEndpoints.GetAllOnPage);
 
         app.MapGet(APIRoutes.Posts.Get, PostsEndpoints.Get);
 
