@@ -4,6 +4,7 @@ using System.Diagnostics;
 
 namespace PTBlog.Controllers;
 
+[ApiExplorerSettings(IgnoreApi = true)]
 public sealed class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;

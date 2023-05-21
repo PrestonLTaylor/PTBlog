@@ -3,6 +3,7 @@ using Westwind.AspNetCore.Markdown;
 
 namespace PTBlog.Controllers
 {
+	[ApiExplorerSettings(IgnoreApi = true)]
 	public class MarkdownController : Controller
 	{
 		[HttpPost]
