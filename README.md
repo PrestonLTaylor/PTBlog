@@ -1,3 +1,4 @@
+
 # PTBlog
 
 A blog web application made in ASP.NET using MVC.
@@ -21,9 +22,14 @@ dotnet test
 ```
 
 # API Documentation
-To get all posts:
+To get all posts on a page:
 ```
 GET /api/v1/posts/
+
+Example body:
+{
+	"Page": 1
+}
 ```
 
 To get a post by it's ID:
