@@ -1,27 +1,14 @@
-using Serilog;
 using PTBlog.Data;
-using PTBlog.Models;
-using Microsoft.EntityFrameworkCore;
 using PTBlog.Data.Repositories;
 using Westwind.AspNetCore.Markdown;
-using Markdig;
-using Microsoft.AspNetCore.Identity;
 using PTBlog.Endpoints.V1;
+using PTBlog.Installers;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Host.UseSerilog((context, config) =>
-{
-    config.ReadFrom.Configuration(builder.Configuration);
-});
+builder.Host.UseSerilogWithConfiguration(builder.Configuration);
 
-var connectionString = builder.Configuration.GetValue<string>("POSTGRESQLCONNSTR_DefaultConnection") ?? throw new InvalidOperationException("Connection string 'POSTGRESQLCONNSTR_DefaultConnection' not found.");
-builder.Services.AddDbContext<DatabaseContext>(options =>
-{
-    options.UseNpgsql(connectionString);
-});
-
-builder.Services.AddDefaultIdentity<UserModel>().AddRoles<IdentityRole>().AddEntityFrameworkStores<DatabaseContext>();
+builder.Services.AddPsqlDbContext(builder.Configuration);
 
 builder.Services.AddRepositoriesSerivces();
 builder.Services.AddControllersWithViews();
@@ -31,10 +18,9 @@ builder.Services.AddRazorPages();
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
 
-builder.Services.AddMarkdown(options =>
-{
-    options.ConfigureMarkdigPipeline = builder => { builder.DisableHtml(); };
-});
+builder.Services.AddMarkdownServices();
+
+builder.Services.AddSwaggerServices();
 
 var app = builder.Build();
 
@@ -47,6 +33,8 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseMarkdown();
+
+app.UseSwaggerAndUI();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

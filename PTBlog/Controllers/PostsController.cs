@@ -8,6 +8,7 @@ using PTBlog.Models;
 namespace PTBlog.Controllers;
 
 [Route("{controller}")]
+[ApiExplorerSettings(IgnoreApi = true)]
 public sealed class PostsController : Controller
 {
     public PostsController(IPostsRepository postsRepository, IUsersRepository usersRepository)
