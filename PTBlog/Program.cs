@@ -1,29 +1,14 @@
-using Serilog;
 using PTBlog.Data;
-using PTBlog.Models;
-using Microsoft.EntityFrameworkCore;
 using PTBlog.Data.Repositories;
 using Westwind.AspNetCore.Markdown;
-using Markdig;
-using Microsoft.AspNetCore.Identity;
 using PTBlog.Endpoints.V1;
-using Microsoft.OpenApi.Models;
-using PTBlog.Configuration;
+using PTBlog.Installers;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Host.UseSerilog((context, config) =>
-{
-    config.ReadFrom.Configuration(builder.Configuration);
-});
+builder.Host.UseSerilogWithConfiguration(builder.Configuration);
 
-var connectionString = builder.Configuration.GetValue<string>("POSTGRESQLCONNSTR_DefaultConnection") ?? throw new InvalidOperationException("Connection string 'POSTGRESQLCONNSTR_DefaultConnection' not found.");
-builder.Services.AddDbContext<DatabaseContext>(options =>
-{
-    options.UseNpgsql(connectionString);
-});
-
-builder.Services.AddDefaultIdentity<UserModel>().AddRoles<IdentityRole>().AddEntityFrameworkStores<DatabaseContext>();
+builder.Services.AddPsqlDbContext(builder.Configuration);
 
 builder.Services.AddRepositoriesSerivces();
 builder.Services.AddControllersWithViews();
@@ -33,33 +18,9 @@ builder.Services.AddRazorPages();
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
 
-builder.Services.AddMarkdown(options =>
-{
-    options.ConfigureMarkdigPipeline = builder => { builder.DisableHtml(); };
-});
+builder.Services.AddMarkdownServices();
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen((options) =>
-{
-	options.SwaggerDoc(APIRoutes.Version, new OpenApiInfo { Title = $"PTBlog API {APIRoutes.Version}", Version = APIRoutes.Version });
-
-	const string apiKeyId = "API Key";
-	options.AddSecurityDefinition(apiKeyId, new OpenApiSecurityScheme
-	{
-		Name = "API_KEY",
-		Description = "API Key authorization in request headers",
-		In = ParameterLocation.Header,
-		Type = SecuritySchemeType.ApiKey,
-	});
-	options.AddSecurityRequirement(new OpenApiSecurityRequirement { { new OpenApiSecurityScheme()
-	{
-		Reference = new OpenApiReference
-		{
-			Type = ReferenceType.SecurityScheme,
-			Id = apiKeyId,
-		}
-	}, new List<string>() } });
-});
+builder.Services.AddSwaggerServices();
 
 var app = builder.Build();
 
@@ -73,9 +34,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseMarkdown();
 
-var swaggerConfiguration = SwaggerConfiguration.From(app.Configuration) ?? throw new InvalidOperationException($"Swagger configuration not found.");
-app.UseSwagger((options) => { options.RouteTemplate = swaggerConfiguration.RouteTemplate; });
-app.UseSwaggerUI((options) => { options.SwaggerEndpoint(swaggerConfiguration.Endpoint, swaggerConfiguration.Description); });
+app.UseSwaggerAndUI();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
