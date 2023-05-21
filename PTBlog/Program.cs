@@ -42,6 +42,23 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen((options) =>
 {
 	options.SwaggerDoc(APIRoutes.Version, new OpenApiInfo { Title = $"PTBlog API {APIRoutes.Version}", Version = APIRoutes.Version });
+
+	const string apiKeyId = "API Key";
+	options.AddSecurityDefinition(apiKeyId, new OpenApiSecurityScheme
+	{
+		Name = "API_KEY",
+		Description = "API Key authorization in request headers",
+		In = ParameterLocation.Header,
+		Type = SecuritySchemeType.ApiKey,
+	});
+	options.AddSecurityRequirement(new OpenApiSecurityRequirement { { new OpenApiSecurityScheme()
+	{
+		Reference = new OpenApiReference
+		{
+			Type = ReferenceType.SecurityScheme,
+			Id = apiKeyId,
+		}
+	}, new List<string>() } });
 });
 
 var app = builder.Build();
